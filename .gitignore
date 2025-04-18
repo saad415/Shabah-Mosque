@@ -1,0 +1,26 @@
+# Android/Java specific
+*.apk
+*.ap_
+*.aab
+
+# Gradle
+.gradle/
+build/
+**/build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Local configuration
+local.properties
+.idea/
+*.iml
+
+# Log files
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Keystore
+*.jks
+*.keystore
