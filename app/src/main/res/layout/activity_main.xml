@@ -407,7 +407,9 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:id="@+id/bottomNavigationView"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
             android:background="@color/purple_700"
             app:itemIconTint="@color/white"
             app:itemTextColor="@color/white"
