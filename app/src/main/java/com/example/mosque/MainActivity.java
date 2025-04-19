@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
     private ActivityMainBinding binding;
-
+    private DBHelper dbHelper;
     private DrawerLayout drawer;
     private BottomNavigationView bottomNav;
 
@@ -88,6 +88,12 @@ public class MainActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             bottomNav.setSelectedItemId(R.id.item_one);
         }
+
+        //testing getting data from sqlite
+        dbHelper = new DBHelper(this);
+        PrayerTimes times = dbHelper.getPrayerTimes();
+        Toast.makeText(this, "Fajr: " + times.getFajr(), Toast.LENGTH_SHORT).show();
+
     }
 
     @Override
