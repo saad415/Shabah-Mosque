@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mosque"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
         <!-- SplashActivity is now the launcher -->
@@ -37,6 +38,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+
+
     </application>
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

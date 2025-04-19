@@ -1,11 +1,19 @@
 package com.example.mosque;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.mosque.ui.home.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -23,6 +31,9 @@ import com.example.mosque.R;
 
 import com.example.mosque.databinding.ActivityMainBinding;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -30,13 +41,27 @@ public class MainActivity extends AppCompatActivity {
     private DBHelper dbHelper;
     private DrawerLayout drawer;
     private BottomNavigationView bottomNav;
-
+    private TextView tvFajrTime, tvDhuhrTime, tvAsrTime, tvMaghribTime, tvIshaTime;
+    String url = "http://192.168.178.29:5000/api/prayer_times"; //http://192.168.178.29:5000/api/prayer_times
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        tvFajrTime = findViewById(R.id.tvFajrTime);
+        tvDhuhrTime   = findViewById(R.id.tvDhuhrTime);
+        tvAsrTime     = findViewById(R.id.tvAsrTime);
+        tvMaghribTime = findViewById(R.id.tvMaghribTime);
+        tvIshaTime    = findViewById(R.id.tvIshaTime);
+
+
+
+
+
 
         setSupportActionBar(binding.appBarMain.toolbar);
         binding.appBarMain.fab.setOnClickListener(new View.OnClickListener() {
@@ -89,10 +114,60 @@ public class MainActivity extends AppCompatActivity {
             bottomNav.setSelectedItemId(R.id.item_one);
         }
 
-        //testing getting data from sqlite
+        //testing locally get  getting data from sqlite
         dbHelper = new DBHelper(this);
         PrayerTimes times = dbHelper.getPrayerTimes();
         Toast.makeText(this, "Fajr: " + times.getFajr(), Toast.LENGTH_SHORT).show();
+
+        //getting data from sqlite localhost
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
+                Request.Method.GET, url, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        StringBuilder builder = new StringBuilder();
+                        try {
+                            if (response.length() == 0) {
+                                Toast.makeText(MainActivity.this,
+                                        "No data received",
+                                        Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            // Grab the first object
+                            JSONObject obj = response.getJSONObject(0);
+
+                            // Populate your TextViews
+                            tvFajrTime.setText(obj.getString("fajr"));
+                            tvDhuhrTime.setText(obj.getString("dhuhr"));
+                            tvAsrTime.setText(obj.getString("asr"));
+                            tvMaghribTime.setText(obj.getString("magrib"));
+                            tvIshaTime.setText(obj.getString("isha"));
+
+                        } catch (Exception e) {
+                            Log.e("MainActivity", "JSON parse / view‑binding failed", e);
+                            Toast.makeText(
+                                    MainActivity.this,
+                                    "Error: " + e.getClass().getSimpleName() + " – " + e.getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                        Toast.makeText(MainActivity.this,
+                                "Network error",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+        );
+
+        queue.add(jsonArrayRequest);
+
+
 
     }
 
