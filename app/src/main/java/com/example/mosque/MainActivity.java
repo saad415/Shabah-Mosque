@@ -21,6 +21,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -34,6 +36,12 @@ import com.example.mosque.databinding.ActivityMainBinding;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Locale;
+
 public class MainActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
@@ -42,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private DrawerLayout drawer;
     private BottomNavigationView bottomNav;
     private TextView tvFajrTime, tvDhuhrTime, tvAsrTime, tvMaghribTime, tvIshaTime;
+    private TextView tvNextPrayerDate;
+
+    private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
+
+
     String url = "http://192.168.178.29:5000/api/prayer_times"; //http://192.168.178.29:5000/api/prayer_times
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,9 +71,17 @@ public class MainActivity extends AppCompatActivity {
         tvMaghribTime = findViewById(R.id.tvMaghribTime);
         tvIshaTime    = findViewById(R.id.tvIshaTime);
 
+        tvNextPrayerDate = findViewById(R.id.tvNextPrayerDate);
+        tvFajr = findViewById(R.id.tvFajr);
+        tvDhuhr = findViewById(R.id.tvDhuhr);
+        tvAsr = findViewById(R.id.tvAsr);
+        tvMaghrib = findViewById(R.id.tvMaghrib);
+        tvIsha = findViewById(R.id.tvIsha);
 
+        updateDate();
 
-
+        tvFajr.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
+        tvFajrTime.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
 
 
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -183,5 +204,11 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
+    }
+    private void updateDate() {
+        Calendar cal = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault());
+        String formattedDate = dateFormat.format(cal.getTime());
+        tvNextPrayerDate.setText("Date: " + formattedDate);
     }
 }
