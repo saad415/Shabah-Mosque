@@ -36,10 +36,12 @@ import com.example.mosque.databinding.ActivityMainBinding;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
 
+    Date now = new Date();
+    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
     String url = "http://192.168.178.29:5000/api/prayer_times"; //http://192.168.178.29:5000/api/prayer_times
     @Override
@@ -80,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
 
         updateDate();
 
-        tvFajr.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
-        tvFajrTime.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
+
+
 
 
         setSupportActionBar(binding.appBarMain.toolbar);
@@ -138,7 +142,6 @@ public class MainActivity extends AppCompatActivity {
         //testing locally get  getting data from sqlite
         dbHelper = new DBHelper(this);
         PrayerTimes times = dbHelper.getPrayerTimes();
-        Toast.makeText(this, "Fajr: " + times.getFajr(), Toast.LENGTH_SHORT).show();
 
         //getting data from sqlite localhost
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -165,6 +168,33 @@ public class MainActivity extends AppCompatActivity {
                             tvMaghribTime.setText(obj.getString("magrib"));
                             tvIshaTime.setText(obj.getString("isha"));
 
+
+                            Date fajrTime = sdf.parse(tvFajrTime.getText().toString());
+                            Date dhuhrTime = sdf.parse(tvDhuhrTime.getText().toString());
+                            Date asrTime = sdf.parse(tvAsrTime.getText().toString());
+                            Date magTime = sdf.parse(tvMaghribTime.getText().toString());
+                            Date ishaTime = sdf.parse(tvIshaTime.getText().toString());
+                            String currentTimeStr = sdf.format(now);
+                            Date currentTime = sdf.parse(currentTimeStr);
+
+                            if (currentTime.after(fajrTime) && currentTime.before(dhuhrTime)) {
+                                tvFajr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvFajrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                            }
+                            else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
+                                tvDhuhr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvDhuhrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                            } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
+                                tvAsr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvAsrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                            } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
+                                tvMaghrib.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvMaghribTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                            } else {
+                                tvIsha.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvIshaTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                            }
+
                         } catch (Exception e) {
                             Log.e("MainActivity", "JSON parse / view‑binding failed", e);
                             Toast.makeText(
@@ -188,7 +218,21 @@ public class MainActivity extends AppCompatActivity {
 
         queue.add(jsonArrayRequest);
 
+        try {
 
+            Date asrTime = sdf.parse("17:00");  // drop the “AM”
+            Date dhuhrTime = sdf.parse("05:44");  // drop the “AM”
+            Date fajrTime = sdf.parse(tvFajrTime.getText().toString());
+
+            if (now.after(dhuhrTime) && now.before(asrTime)) {
+                Toast.makeText(this, "Fajr: " + times.getFajr(), Toast.LENGTH_SHORT).show();
+
+                tvFajr.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
+                tvFajrTime.setTextColor(ContextCompat.getColor(this, R.color.purple_700));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
     }
 
