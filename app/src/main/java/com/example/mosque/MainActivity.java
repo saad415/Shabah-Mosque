@@ -1,5 +1,10 @@
 package com.example.mosque;
 
+import android.graphics.Typeface;
+import android.icu.text.DateFormat;
+import android.icu.util.IslamicCalendar;
+import android.icu.util.ULocale;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -54,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvFajrTime, tvDhuhrTime, tvAsrTime, tvMaghribTime, tvIshaTime;
     private TextView tvNextPrayerDate;
 
+    private TextView tvhijriDate;
     private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
 
     Date now = new Date();
@@ -69,6 +75,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+
+        tvhijriDate = findViewById(R.id.tvHijriDate);
+
         tvFajrTime = findViewById(R.id.tvFajrTime);
         tvDhuhrTime   = findViewById(R.id.tvDhuhrTime);
         tvAsrTime     = findViewById(R.id.tvAsrTime);
@@ -81,6 +90,24 @@ public class MainActivity extends AppCompatActivity {
         tvAsr = findViewById(R.id.tvAsr);
         tvMaghrib = findViewById(R.id.tvMaghrib);
         tvIsha = findViewById(R.id.tvIsha);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // Build a ULocale that uses the Umm‑al‑Qura calendar
+            ULocale uLocale = ULocale.forLocale(Locale.getDefault())
+                    .setKeywordValue("calendar","islamic-umalqura");
+
+            // Get an ICU DateFormat in that locale
+            DateFormat fmt = DateFormat.getDateInstance(
+                    DateFormat.LONG,    // e.g. “22 Shawwal 1446 AH”
+                    uLocale
+            );
+
+            // Format *now*:
+            String hijri = fmt.format(new Date());
+            tvhijriDate.setText(hijri);
+        } else {
+            tvhijriDate.setText("Requires API 24+");
+        }
 
         updateDate();
 
@@ -180,19 +207,29 @@ public class MainActivity extends AppCompatActivity {
                             if (currentTime.after(fajrTime) && currentTime.before(dhuhrTime)) {
                                 tvFajr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
                                 tvFajrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvFajr.setTypeface(null, Typeface.BOLD);
+                                tvFajrTime.setTypeface(null, Typeface.BOLD);
                             }
                             else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
                                 tvDhuhr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
                                 tvDhuhrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvDhuhr.setTypeface(null, Typeface.BOLD);
+                                tvDhuhrTime.setTypeface(null, Typeface.BOLD);
                             } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
                                 tvAsr.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
                                 tvAsrTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvAsr.setTypeface(null, Typeface.BOLD);
+                                tvAsrTime.setTypeface(null, Typeface.BOLD);
                             } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
                                 tvMaghrib.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvMaghrib.setTypeface(null, Typeface.BOLD);
+                                tvMaghribTime.setTypeface(null, Typeface.BOLD);
                             } else {
                                 tvIsha.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
                                 tvIshaTime.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.purple_700));
+                                tvIsha.setTypeface(null, Typeface.BOLD);
+                                tvIshaTime.setTypeface(null, Typeface.BOLD);
                             }
 
                         } catch (Exception e) {
