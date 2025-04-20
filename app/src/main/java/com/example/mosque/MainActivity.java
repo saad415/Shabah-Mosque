@@ -1,5 +1,6 @@
 package com.example.mosque;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.icu.text.DateFormat;
 import android.icu.util.IslamicCalendar;
@@ -10,6 +11,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,6 +31,9 @@ import com.google.android.material.navigation.NavigationView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -62,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvhijriDate;
     private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
 
+    ImageView imageView;
     Date now = new Date();
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
@@ -90,6 +97,9 @@ public class MainActivity extends AppCompatActivity {
         tvAsr = findViewById(R.id.tvAsr);
         tvMaghrib = findViewById(R.id.tvMaghrib);
         tvIsha = findViewById(R.id.tvIsha);
+
+
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // Build a ULocale that uses the Umm‑al‑Qura calendar
@@ -144,15 +154,23 @@ public class MainActivity extends AppCompatActivity {
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                FrameLayout main = findViewById(R.id.fragment_container_main);
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.item_one) {
                     Toast.makeText(MainActivity.this, "First Button Clicked", Toast.LENGTH_SHORT).show();
-                    // openFragment(new HomeFragment());
+                    //openFragment(new HomeFragment());    // ← add this line
+                    //getSupportFragmentManager().popBackStack();  // ← goes back to HomeFragment
+                    //openFragment(new HomeFragment());
                     return true;
                 } else if (itemId == R.id.item_two) {
                     Toast.makeText(MainActivity.this, "Second Button Clicked", Toast.LENGTH_SHORT).show();
-                    // openFragment(new SearchFragment());
+                    //openFragment(new HomeFragment());
+                    //main.setVisibility(View.GONE);
+                    Intent intent = new Intent(MainActivity.this, NavigationActivity.class);
+                    startActivity(intent);
+                    //openFragment(new ContactDetailsFragment());
+
                     return true;
                 }
 
@@ -164,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
         // 5) Load default fragment
         if (savedInstanceState == null) {
             bottomNav.setSelectedItemId(R.id.item_one);
+            //openFragment(new HomeFragment());
         }
 
         //testing locally get  getting data from sqlite
@@ -292,4 +311,11 @@ public class MainActivity extends AppCompatActivity {
         String formattedDate = dateFormat.format(cal.getTime());
         tvNextPrayerDate.setText("Date: " + formattedDate);
     }
+    private void openFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, fragment)   // <-- use the activity’s container
+                .addToBackStack(null)
+                .commit();
+    }
+
 }

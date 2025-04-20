@@ -13,7 +13,10 @@
         android:theme="@style/Theme.Mosque"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".NavigationActivity"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Mosque.NoActionBar" />
         <!-- SplashActivity is now the launcher -->
         <activity
             android:name=".SplashActivity"
@@ -35,7 +38,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 

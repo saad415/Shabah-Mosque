@@ -1,11 +1,396 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".ui.home.HomeFragment">
+    android:layout_height="match_parent">
 
+    <ImageView
+        android:id="@+id/headerImage"
+        android:layout_width="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_height="160dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/dua"
+        android:contentDescription="Contact image" />
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:background="#80000000"
+        app:layout_constraintTop_toTopOf="@id/headerImage"
+        app:layout_constraintStart_toStartOf="@id/headerImage"
+        app:layout_constraintEnd_toEndOf="@id/headerImage"/>
+
+    <!-- 1) TITLE -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Prayers Time"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintStart_toStartOf="@id/headerImage"
+        app:layout_constraintBottom_toBottomOf="@id/headerImage"/>
+
+    <!-- 2) LOCATION -->
+    <TextView
+        android:id="@+id/tvLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nuremberg, Germany"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="36dp"
+        app:layout_constraintStart_toStartOf="@id/headerImage"
+        app:layout_constraintBottom_toBottomOf="@id/headerImage"/>
+
+    <!-- 3) HIJRI DATE -->
+    <TextView
+        android:id="@+id/tvHijriDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="October 21, 1446"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintStart_toStartOf="@id/headerImage"
+        app:layout_constraintBottom_toBottomOf="@id/headerImage"/>
+
+    <!-- 6) GREEN BAR -->
+    <LinearLayout
+        android:id="@+id/barAsr"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:background="@color/purple_700"
+        app:layout_constraintTop_toBottomOf="@id/headerImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/tvAsrNameTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Asr 06:57 PM"
+            android:textSize="16sp"
+            android:textColor="@android:color/white"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/tvNextPrayerDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <ScrollView
+        android:id="@+id/scrollPrayers"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/barAsr"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Fajr -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:orientation="horizontal"
+                    android:background="@android:color/white"
+
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Fajr"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvFajr"
+                        android:textSize="16sp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/tvFajrTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:text=""
+
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp" />
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_slideshow"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Take photo"
+                        android:layout_marginEnd="8dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_gallery"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Pick from gallery"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Dhuhr -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:background="@android:color/white"
+
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Dhuhr"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvDhuhr"
+
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="12:30"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvDhuhrTime"
+
+                        android:textSize="16sp"
+                        android:layout_marginEnd="16dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_camera"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Take photo"
+                        android:layout_marginEnd="8dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_gallery"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Pick from gallery"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Asr -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:background="@android:color/white"
+
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Asr"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvAsr"
+
+                        android:textSize="16sp"
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15:45"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvAsrTime"
+
+                        android:textSize="16sp"
+                        android:layout_marginEnd="16dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_gallery"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Take photo"
+                        android:layout_marginEnd="8dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_camera"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Pick from gallery"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+
+                    android:orientation="horizontal"
+                    android:background="@android:color/white"
+
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Mahgrib"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvMaghrib"
+
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15:45"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvMaghribTime"
+
+                        android:textSize="16sp"
+                        android:layout_marginEnd="16dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_gallery"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Take photo"
+                        android:layout_marginEnd="8dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_camera"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Pick from gallery"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                app:cardElevation="4dp"
+                android:layout_marginBottom="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:orientation="horizontal"
+                    android:background="@android:color/white"
+                    android:gravity="center_vertical"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:text="Isha"
+                        android:textSize="16sp"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvIsha"
+
+                        android:layout_weight="1"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15:45"
+                        android:textColor="@android:color/black"
+                        android:id="@+id/tvIshaTime"
+
+                        android:textSize="16sp"
+                        android:layout_marginEnd="16dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_gallery"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Take photo"
+                        android:layout_marginEnd="8dp"/>
+
+                    <ImageButton
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_menu_camera"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Pick from gallery"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
