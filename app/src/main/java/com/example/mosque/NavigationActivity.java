@@ -1,9 +1,14 @@
 package com.example.mosque;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -15,6 +20,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 public class NavigationActivity extends AppCompatActivity {
+    private static final int ADMIN_TRIGGER_TAPS = 5;
+    private int contactTapCount = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +51,12 @@ public class NavigationActivity extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.item_three) {
                     openFragment(new ContactFragment());
+                    contactTapCount++;
+                    if (contactTapCount >= ADMIN_TRIGGER_TAPS) {
+                        contactTapCount = 0;
+                        showAdminLoginDialog();
+                    }
+                    return true;
                 }
 
                 return false;
@@ -62,5 +75,40 @@ public class NavigationActivity extends AppCompatActivity {
                 .replace(R.id.fragment_container, fragment)   // <-- use the activity’s container
                 .addToBackStack(null)
                 .commit();
+    }
+    private void showAdminLoginDialog() {
+        View v = getLayoutInflater().inflate(R.layout.dialog_admin_login, null);
+        EditText etUser = v.findViewById(R.id.et_username);
+        EditText etPass = v.findViewById(R.id.et_password);
+
+        new AlertDialog.Builder(this)
+                .setView(v)
+                .setPositiveButton("OK", (dlg, which) -> {
+                    String u = etUser.getText().toString().trim();
+                    String p = etPass.getText().toString().trim();
+                    if (u.equals(BuildConfig.ADMIN_USER)
+                            && p.equals(BuildConfig.ADMIN_PASS)) {
+                        Toast.makeText(this, "Admin logged in", Toast.LENGTH_SHORT).show();
+                        grantAdmin();
+                    } else {
+                        Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+    private void grantAdmin() {
+        // Option A) Static flag on your Application subclass:
+        // ((MyApp)getApplication()).isAdmin = true;
+
+        // Option B) SharedPreferences (persists across restarts):
+        getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("isAdmin", true)
+                .apply();
+    }
+    public static boolean isAdmin(Context ctx) {
+        return ctx.getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getBoolean("isAdmin", false);
     }
 }

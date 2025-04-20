@@ -5,7 +5,9 @@ plugins {
 android {
     namespace = "com.example.mosque"
     compileSdk = 35
-
+    buildFeatures {
+        buildConfig = true
+    }
     defaultConfig {
         applicationId = "com.example.mosque"
         minSdk = 24
@@ -14,6 +16,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Adding BuildConfig fields
+        buildConfigField("String", "ADMIN_USER", "\"superuser\"")
+        buildConfigField("String", "ADMIN_PASS", "\"letmein123\"")
     }
 
     buildTypes {
