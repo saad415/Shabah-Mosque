@@ -13,9 +13,9 @@
 
     <fragment
         android:id="@+id/nav_gallery"
-        android:name="com.example.mosque.ui.gallery.GalleryFragment"
+        android:name="com.example.mosque.ui.gallery.ContactFragment"
         android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_contact" />
 
     <fragment
         android:id="@+id/nav_slideshow"

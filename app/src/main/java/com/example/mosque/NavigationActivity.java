@@ -9,6 +9,7 @@ import android.widget.Toast;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 
+import com.example.mosque.ui.gallery.ContactFragment;
 import com.example.mosque.ui.home.HomeFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
@@ -41,6 +42,8 @@ public class NavigationActivity extends AppCompatActivity {
                     openFragment(new PrayerFragment());
 
                     return true;
+                } else if (itemId == R.id.item_three) {
+                    openFragment(new ContactFragment());
                 }
 
                 return false;

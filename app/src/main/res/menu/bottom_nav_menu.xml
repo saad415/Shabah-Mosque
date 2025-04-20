@@ -2,10 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/item_one"
-        android:title="First Button"
+        android:title="Prayers"
         />
     <item
         android:id="@+id/item_two"
-        android:title="Second Button"
+        android:title="Posts"
+        />
+    <item
+        android:id="@+id/item_three"
+        android:title="Contact"
         />
 </menu>
