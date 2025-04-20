@@ -38,7 +38,7 @@ public class NavigationActivity extends AppCompatActivity {
                     Toast.makeText(NavigationActivity.this, "Second Button Clicked", Toast.LENGTH_SHORT).show();
                     //openFragment(new HomeFragment());
                     //main.setVisibility(View.GONE);
-                    openFragment(new ContactDetailsFragment());
+                    openFragment(new PrayerFragment());
 
                     return true;
                 }
