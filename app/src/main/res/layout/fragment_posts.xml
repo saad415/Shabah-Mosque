@@ -41,7 +41,7 @@
                     android:textColor="@android:color/black"
                     android:paddingStart="5dp"
                     android:paddingEnd="5dp"
-                    android:hint="What's on your mind, Imam Ahmad?"
+                    android:hint="What's on your mind?"
                     android:textColorHint="#564343"
                     android:inputType="textMultiLine"
                     android:maxHeight="200dp"
