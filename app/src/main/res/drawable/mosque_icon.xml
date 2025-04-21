@@ -1,0 +1,30 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Dome -->
+    <path
+        android:fillColor="@color/purple_700"
+        android:pathData="M12,4C9,4 6,7 6,10v1h12v-1c0,-3 -3,-6 -6,-6z" />
+
+    <!-- Minaret Left -->
+    <path
+        android:fillColor="@color/purple_700"
+        android:pathData="M4,2v20h2v-20h-2z" />
+
+    <!-- Minaret Right -->
+    <path
+        android:fillColor="@color/purple_700"
+        android:pathData="M18,2v20h2v-20h-2z" />
+
+    <!-- Main building -->
+    <path
+        android:fillColor="@color/purple_700"
+        android:pathData="M6,11v9h12v-9H6z" />
+
+    <!-- Entrance -->
+
+
+</vector>
