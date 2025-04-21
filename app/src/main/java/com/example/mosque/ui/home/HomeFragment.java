@@ -1,18 +1,27 @@
 package com.example.mosque.ui.home;
 
+import static androidx.core.app.ActivityCompat.recreate;
 import static com.example.mosque.NavigationActivity.isAdmin;
 
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
+
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Calendar;
 import android.graphics.Typeface;
 import android.icu.text.DateFormat;
 import android.icu.util.ULocale;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,7 +44,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -47,6 +55,8 @@ public class HomeFragment extends Fragment {
     private TextView tvFajrTime, tvDhuhrTime, tvAsrTime, tvMaghribTime, tvIshaTime;
     private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
     private DBHelper dbHelper;
+    ProgressBar progressBar;
+
     String url = "http://192.168.178.29:5000/api/prayer_times"; //http://192.168.178.29:5000/api/prayer_times
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
@@ -61,6 +71,7 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
 
+        progressBar = root.findViewById(R.id.progressBar);
         tvhijriDate = root.findViewById(R.id.tvHijriDate);
         tvNextPrayerDate = root.findViewById(R.id.tvNextPrayerDate);
         setTvhijriDate();
@@ -94,6 +105,12 @@ public class HomeFragment extends Fragment {
         }
 
 
+        btnEditFajrTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePicker1();
+            }
+        });
 
         getPrayerTimes_and_upadet_bolf();
         // 2) find the ImageView *on that root view*…
@@ -223,5 +240,73 @@ public class HomeFragment extends Fragment {
         );
         queue.add(jsonArrayRequest);
 
+    }
+
+    private void showTimePicker1() {
+        Calendar now = Calendar.getInstance();
+        TimePickerDialog tpd = TimePickerDialog.newInstance(
+                (view, hourOfDay, minute, second) -> {
+                    // Handle the selected time
+                    String time = String.format("%02d:%02d", hourOfDay, minute);
+                    updatePrayerTime("fajr", time);
+                    Toast.makeText(getActivity(), "Selected Time: " + time, Toast.LENGTH_LONG).show();
+
+                },
+                now.get(Calendar.HOUR_OF_DAY),
+                now.get(Calendar.MINUTE),
+                true // for 24 hour time format
+        );
+
+        // Customize TimePickerDialog
+        tpd.setAccentColor(getResources().getColor(R.color.purple_700));
+        tpd.setThemeDark(false); // Set true for dark mode
+        tpd.vibrate(true);
+        tpd.dismissOnPause(true);
+        tpd.enableSeconds(false); // Set true to enable seconds
+        tpd.setVersion(TimePickerDialog.Version.VERSION_2);
+        tpd.show(getParentFragmentManager(), "Timepickerdialog"); // Correct method to use in a Fragment
+
+    }
+
+    private void updatePrayerTime(String prayer, String time) {
+        progressBar.setVisibility(View.VISIBLE);
+
+        new Thread(() -> {
+            try {
+                URL url = new URL("http://192.168.178.29:5000/api/prayer_times/" + prayer);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("PUT");
+                conn.setRequestProperty("Content-Type", "application/json");
+                conn.setDoOutput(true);
+
+                String jsonInputString = "{\"time\":\"" + time + "\"}";
+
+                try (OutputStream os = conn.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+
+                int responseCode = conn.getResponseCode();
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+
+                        Toast.makeText(getActivity(), "Time updated to " + time, Toast.LENGTH_SHORT).show();
+                        recreate(getActivity());
+                    } else {
+                        Toast.makeText(getActivity(), "Update failed: " + responseCode, Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                conn.disconnect();
+            } catch (Exception e) {
+                e.printStackTrace();
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(getActivity(), "Error: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
+            }
+        }).start();
     }
 }

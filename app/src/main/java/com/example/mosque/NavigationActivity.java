@@ -131,7 +131,7 @@ public class NavigationActivity extends AppCompatActivity {
         logout_icon.setVisibility(View.VISIBLE);
     }
 
-    private void logoutAdmin() {
+    public void logoutAdmin() {
         // Option A) Static flag on your Application subclass:
         // ((MyApp)getApplication()).isAdmin = false;
 
@@ -147,4 +147,6 @@ public class NavigationActivity extends AppCompatActivity {
         return ctx.getSharedPreferences("app_prefs", MODE_PRIVATE)
                 .getBoolean("isAdmin", false);
     }
+
+
 }

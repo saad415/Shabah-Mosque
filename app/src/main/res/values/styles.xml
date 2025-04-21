@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MyTimePickerDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog">
+        <!-- Dialog background color -->
+        <item name="colorBackgroundFloating">@color/white</item>
+        <!-- Clock face background -->
+        <item name="clockFaceBackgroundColor">@android:color/white</item>
+
+        <!-- Clock hands color - keep teal -->
+        <item name="colorPrimary">@color/teal_200</item>
+        <item name="colorAccent">@color/teal_200</item>
+        <item name="clockHandColor">@color/teal_200</item>
+
+        <!-- Text colors -->
+        <item name="clockNumberTextColor">@android:color/black</item>
+
+        <!-- Keyboard icon color -->
+        <item name="android:textColorSecondary">@android:color/black</item>
+
+        <!-- For keyboard icon specifically -->
+        <item name="colorControlNormal">@android:color/black</item>
+    </style>
+</resources>
