@@ -143,8 +143,8 @@
                         android:id="@+id/tvFajrTime"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="16dp"
-                        android:text=""
+                        android:layout_marginEnd="16sp"
+                        android:text="05:30"
 
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
@@ -152,17 +152,14 @@
                     <ImageButton
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_slideshow"
+                        android:id="@+id/btnEditFajrTime"
+                        android:src="@drawable/edit_icon"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Take photo"
-                        android:layout_marginEnd="8dp"/>
+                        android:visibility="gone"
+                        />
 
-                    <ImageButton
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_gallery"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Pick from gallery"/>
+
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
 
@@ -206,18 +203,14 @@
                         android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
-                    <ImageButton
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_camera"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Take photo"
-                        android:layout_marginEnd="8dp"/>
+
 
                     <ImageButton
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_gallery"
+                        android:src="@drawable/edit_icon"
+                        android:visibility="gone"
+                        android:id="@+id/btnEditDhuhrTime"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Pick from gallery"/>
                 </LinearLayout>
@@ -249,7 +242,6 @@
                         android:text="Asr"
                         android:textColor="@android:color/black"
                         android:id="@+id/tvAsr"
-
                         android:textSize="16sp"
                         android:layout_weight="1"/>
 
@@ -263,18 +255,14 @@
                         android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
-                    <ImageButton
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_gallery"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Take photo"
-                        android:layout_marginEnd="8dp"/>
+
 
                     <ImageButton
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_camera"
+                        android:visibility="gone"
+                        android:id="@+id/btnEditAsrTime"
+                        android:src="@drawable/edit_icon"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Pick from gallery"/>
                 </LinearLayout>
@@ -319,18 +307,14 @@
                         android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
-                    <ImageButton
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_gallery"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Take photo"
-                        android:layout_marginEnd="8dp"/>
+
 
                     <ImageButton
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_camera"
+                        android:visibility="gone"
+                        android:id="@+id/btnEditMaghribTime"
+                        android:src="@drawable/edit_icon"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Pick from gallery"/>
                 </LinearLayout>
@@ -373,18 +357,14 @@
                         android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
-                    <ImageButton
-                        android:layout_width="36dp"
-                        android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_gallery"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Take photo"
-                        android:layout_marginEnd="8dp"/>
+
 
                     <ImageButton
                         android:layout_width="36dp"
                         android:layout_height="36dp"
-                        android:src="@drawable/ic_menu_camera"
+                        android:src="@drawable/edit_icon"
+                        android:visibility="gone"
+                        android:id="@+id/btnEditIshaTime"
                         android:background="?attr/selectableItemBackgroundBorderless"
                         android:contentDescription="Pick from gallery"/>
                 </LinearLayout>

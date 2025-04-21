@@ -1,5 +1,7 @@
 package com.example.mosque.ui.home;
 
+import static com.example.mosque.NavigationActivity.isAdmin;
+
 import android.graphics.Typeface;
 import android.icu.text.DateFormat;
 import android.icu.util.ULocale;
@@ -9,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +49,8 @@ public class HomeFragment extends Fragment {
     private DBHelper dbHelper;
     String url = "http://192.168.178.29:5000/api/prayer_times"; //http://192.168.178.29:5000/api/prayer_times
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+
+    ImageButton btnEditFajrTime, btnEditDhuhrTime, btnEditAsrTime, btnEditMaghribTime, btnEditIshaTime;
     Date now = new Date();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -73,6 +78,22 @@ public class HomeFragment extends Fragment {
         tvAsr = root.findViewById(R.id.tvAsr);
         tvMaghrib = root.findViewById(R.id.tvMaghrib);
         tvIsha = root.findViewById(R.id.tvIsha);
+
+        btnEditFajrTime = root.findViewById(R.id.btnEditFajrTime);
+        btnEditDhuhrTime = root.findViewById(R.id.btnEditDhuhrTime);
+        btnEditAsrTime = root.findViewById(R.id.btnEditAsrTime);
+        btnEditMaghribTime = root.findViewById(R.id.btnEditMaghribTime);
+        btnEditIshaTime = root.findViewById(R.id.btnEditIshaTime);
+
+        if (isAdmin(getActivity())) {
+            btnEditFajrTime.setVisibility(View.VISIBLE);
+            btnEditDhuhrTime.setVisibility(View.VISIBLE);
+            btnEditAsrTime.setVisibility(View.VISIBLE);
+            btnEditMaghribTime.setVisibility(View.VISIBLE);
+            btnEditIshaTime.setVisibility(View.VISIBLE);
+        }
+
+
 
         getPrayerTimes_and_upadet_bolf();
         // 2) find the ImageView *on that root view*…

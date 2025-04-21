@@ -1,14 +1,18 @@
 package com.example.mosque;
 
+import static com.example.mosque.NavigationActivity.isAdmin;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
@@ -22,6 +26,8 @@ import com.google.android.material.navigation.NavigationBarView;
 public class NavigationActivity extends AppCompatActivity {
     private static final int ADMIN_TRIGGER_TAPS = 5;
     private int contactTapCount = 0;
+
+    ImageView logout_icon;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +35,21 @@ public class NavigationActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Sahabah Mosque");
+
+
+        logout_icon = findViewById(R.id.logout_icon);
+        if (isAdmin(NavigationActivity.this)) {
+            logout_icon.setVisibility(View.VISIBLE);
+        }
+
+        logout_icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logoutAdmin();
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);            }
+        });
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
         bottomNav.setOnItemSelectedListener(new NavigationBarView.OnItemSelectedListener() {
@@ -91,6 +112,7 @@ public class NavigationActivity extends AppCompatActivity {
                         Toast.makeText(this, "Admin logged in", Toast.LENGTH_SHORT).show();
                         grantAdmin();
                     } else {
+                        logoutAdmin();
                         Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -106,7 +128,21 @@ public class NavigationActivity extends AppCompatActivity {
                 .edit()
                 .putBoolean("isAdmin", true)
                 .apply();
+        logout_icon.setVisibility(View.VISIBLE);
     }
+
+    private void logoutAdmin() {
+        // Option A) Static flag on your Application subclass:
+        // ((MyApp)getApplication()).isAdmin = false;
+
+        // Option B) SharedPreferences (persists across restarts):
+        getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .edit()
+                .putBoolean("isAdmin", false)
+                .apply();
+        logout_icon.setVisibility(View.INVISIBLE);
+    }
+
     public static boolean isAdmin(Context ctx) {
         return ctx.getSharedPreferences("app_prefs", MODE_PRIVATE)
                 .getBoolean("isAdmin", false);
