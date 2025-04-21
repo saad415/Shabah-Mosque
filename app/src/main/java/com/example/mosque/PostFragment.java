@@ -10,14 +10,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class PrayerFragment extends Fragment {
+public class PostFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         // 1) inflate your fragment layout
-        View root = inflater.inflate(R.layout.fragment_prayers, container, false);
+        View root = inflater.inflate(R.layout.fragment_posts, container, false);
 
         // 2) find the ImageView *on that root view*…
         ImageView contactImage = root.findViewById(R.id.contactImage);

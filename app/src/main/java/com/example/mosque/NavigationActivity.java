@@ -1,7 +1,5 @@
 package com.example.mosque;
 
-import static com.example.mosque.NavigationActivity.isAdmin;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -67,7 +65,7 @@ public class NavigationActivity extends AppCompatActivity {
                     Toast.makeText(NavigationActivity.this, "Second Button Clicked", Toast.LENGTH_SHORT).show();
                     //openFragment(new HomeFragment());
                     //main.setVisibility(View.GONE);
-                    openFragment(new PrayerFragment());
+                    openFragment(new PostFragment());
 
                     return true;
                 } else if (itemId == R.id.item_three) {
