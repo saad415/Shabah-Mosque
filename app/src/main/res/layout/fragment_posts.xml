@@ -20,92 +20,156 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/white"
-            android:orientation="vertical"
-            android:padding="7dp">
+            android:layout_height="wrap_content">
 
-            <!-- EditText for input -->
-            <EditText
-                android:id="@+id/post_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:gravity="top"
-                android:textColor="@android:color/black"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                android:hint="What's on your mind, Imam Ahmad?"
-                android:textColorHint="#564343"
-                android:inputType="textMultiLine"
-                android:textSize="16sp" />
-
-            <!-- Divider line -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginBottom="5dp"
-                android:background="#E0E0E0" />
-
-            <!-- Buttons for Photo and Post -->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:background="@android:color/white"
-                android:orientation="horizontal">
+                android:orientation="vertical"
+                android:padding="7dp">
 
-                <LinearLayout
-                    android:id="@+id/photo_button"
-                    android:layout_width="0dp"
+                <!-- EditText for input -->
+                <EditText
+                    android:id="@+id/post_input"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:padding="3dp">
+                    android:background="@null"
+                    android:gravity="top"
+                    android:textColor="@android:color/black"
+                    android:paddingStart="5dp"
+                    android:paddingEnd="5dp"
+                    android:hint="What's on your mind, Imam Ahmad?"
+                    android:textColorHint="#564343"
+                    android:inputType="textMultiLine"
+                    android:maxHeight="200dp"
+                    android:textSize="16sp" />
+
+                <FrameLayout
+                    android:id="@+id/previwe_image_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:visibility="gone"
+                    android:layout_marginTop="10dp">
 
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="Photo"
-                        android:src="@drawable/photo_icon" />
+                        android:id="@+id/imagePreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerCrop"
+                        android:visibility="visible"
+                        android:background="@android:color/darker_gray"/>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Photo"
-                        android:textColor="@android:color/black"
-                        android:textSize="14sp" />
-                </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/buttonRemoveImage"
+                        android:layout_width="40dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="8dp"
+                        android:background="@android:color/transparent"
+                        android:src="@drawable/close_icon"
+                        android:contentDescription="Remove Image"
+                        android:visibility="visible"/>
+                </FrameLayout>
 
+                <!-- Divider line -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="#E0E0E0" />
+
+                <!-- Buttons for Photo and Post -->
                 <LinearLayout
-                    android:id="@+id/file_button"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
                     android:orientation="horizontal"
-                    android:padding="3dp">
+                    android:padding="4dp"
+                    android:background="@android:color/white">
 
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginEnd="8dp"
-                        android:contentDescription="File"
-                        android:src="@drawable/post_icon" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
+                    <!-- Photo button -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:textColor="@android:color/black"
-                        android:text="Post"
-                        android:textSize="14sp" />
+                        android:layout_weight="1"
+                        android:layout_marginEnd="4dp"
+                        app:cardCornerRadius="4dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground"
+                        app:cardElevation="2dp"
+                        app:cardUseCompatPadding="false">
+
+                        <LinearLayout
+                            android:id="@+id/photo_button"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingVertical="2dp"
+                            android:paddingHorizontal="6dp"
+                            android:background="@android:color/darker_gray">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginEnd="4dp"
+                                android:src="@drawable/photo_icon"
+                                android:contentDescription="Photo" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Photo"
+                                android:textColor="@android:color/black"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Post button -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        app:cardCornerRadius="4dp"
+                        app:cardElevation="2dp"
+                        app:cardUseCompatPadding="false">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="?attr/selectableItemBackground"
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingVertical="2dp"
+                            android:paddingHorizontal="6dp"
+                            android:background="@color/purple_700">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_marginEnd="4dp"
+                                android:src="@drawable/post_icon"
+                                android:contentDescription="Post" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Post"
+                                android:textColor="@android:color/white"
+                                android:textSize="13sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
                 </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </ScrollView>
     </androidx.cardview.widget.CardView>
 
     <!-- ScrollView for dynamically added posts -->
