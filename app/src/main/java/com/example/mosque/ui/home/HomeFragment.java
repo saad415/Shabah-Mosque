@@ -108,9 +108,35 @@ public class HomeFragment extends Fragment {
         btnEditFajrTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePicker1();
+                showTimePicker1("fajr");
             }
         });
+        btnEditDhuhrTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePicker1("dhuhr");
+            }
+        });
+        btnEditAsrTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePicker1("asr");
+            }
+        });
+        btnEditMaghribTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePicker1("magrib");
+            }
+        });
+        btnEditIshaTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePicker1("isha");
+            }
+        });
+
+
 
         getPrayerTimes_and_upadet_bolf();
         // 2) find the ImageView *on that root view*…
@@ -242,13 +268,14 @@ public class HomeFragment extends Fragment {
 
     }
 
-    private void showTimePicker1() {
+    private void showTimePicker1(String prayer) {
         Calendar now = Calendar.getInstance();
         TimePickerDialog tpd = TimePickerDialog.newInstance(
                 (view, hourOfDay, minute, second) -> {
                     // Handle the selected time
                     String time = String.format("%02d:%02d", hourOfDay, minute);
-                    updatePrayerTime("fajr", time);
+                    updatePrayerTime(prayer, time);
+                    //updatePrayerTime("fajr", time);
                     Toast.makeText(getActivity(), "Selected Time: " + time, Toast.LENGTH_LONG).show();
 
                 },
