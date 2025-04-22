@@ -3,6 +3,7 @@ import sqlite3
 from get_prayer_times import get_prayer_times
 from update_prayer_time import update_prayer_time
 from upload_post import  register_upload_route
+from get_posts import get_posts, get_posts1
 
 
 app = Flask(__name__)
@@ -34,7 +35,10 @@ def api_update_prayer(prayer_name):
     return jsonify({"message": f"{prayer_name} updated to {new_time}"}), 200
 
 
-
+@app.route("/api/getposts", methods=["GET"])
+def api_get_posts():
+    rows = get_posts1()
+    return rows
 
 
 if __name__ == "__main__":
