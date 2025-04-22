@@ -17,7 +17,7 @@ def init_db():
             CREATE TABLE IF NOT EXISTS posts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 text TEXT NOT NULL,
-                filepath TEXT NOT NULL
+                filepath TEXT
             )
         ''')
         conn.commit()
@@ -25,20 +25,22 @@ def init_db():
 def register_upload_route(app):
     @app.route('/upload', methods=['POST'])
     def upload_post():
-        if 'picture' not in request.files or 'text' not in request.form:
-            return jsonify({'error': 'Missing picture or text field'}), 400
+        if 'text' not in request.form:
+            return jsonify({'error': 'Missing text field'}), 400
 
-        file = request.files['picture']
         text = request.form['text']
+        path = None  # Default to None for posts without images
 
-        if file.filename == '':
-            return jsonify({'error': 'No selected file'}), 400
-
-        original = secure_filename(file.filename)
-        ext = os.path.splitext(original)[1]
-        unique = f"{uuid.uuid4().hex}{ext}"
-        path = os.path.join(UPLOAD_FOLDER, unique)
-        file.save(path)
+        # Handle file upload if a picture is included
+        if 'picture' in request.files:
+            file = request.files['picture']
+            
+            if file.filename != '':
+                original = secure_filename(file.filename)
+                ext = os.path.splitext(original)[1]
+                unique = f"{uuid.uuid4().hex}{ext}"
+                path = os.path.join(UPLOAD_FOLDER, unique)
+                file.save(path)
 
         with sqlite3.connect(DATABASE) as conn:
             c = conn.cursor()
