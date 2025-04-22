@@ -28,7 +28,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import android.view.MenuItem;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,7 +41,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
-import com.squareup.picasso.Picasso;   // ← add Picasso dependency
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,25 +51,16 @@ public class PostFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private ImageView imagePreview;
-
-    private ImageView moreVctor;
-
     FrameLayout previwe_image_container;
     private ImageButton buttonRemoveImage;
     LinearLayout photoButton, postButton;
     private Uri selectedImageUri;
     private EditText postTextInput;
-    // Replace with your server URL
-   // private static final String UPLOAD_URL = "http://192.168.178.29:5000/upload";
     private static final String BASE_URL = "http://192.168.178.29:5000";
     private static final String UPLOAD_URL = BASE_URL + "/upload";
-
     private static final String POSTS_URL = BASE_URL + "/api/getposts";
+    private int editingPostId = -1;
 
-    //private OkHttpClient client = new OkHttpClient();
-
-
-    // Extended timeout for slower connections
     private OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(10, TimeUnit.SECONDS)
             .readTimeout(10, TimeUnit.SECONDS)
@@ -81,205 +71,235 @@ public class PostFragment extends Fragment {
 
     @Nullable
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        // 1) inflate your fragment layout
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_posts, container, false);
         postTextInput = root.findViewById(R.id.post_text_input);
-        //moreVctor = root.findViewById(R.id.imageView);
-        //moreVctor.setOnClickListener(new View.OnClickListener() {
-        //    @Override
-        //    public void onClick(View view) {
-                //showPopupMenu(view);
-         //       customPopup(view);
-         //   }
-        // });
         imagePreview = root.findViewById(R.id.imagePreview);
-        buttonRemoveImage = root.findViewById(R.id.buttonRemoveImage); // initialize
+        buttonRemoveImage = root.findViewById(R.id.buttonRemoveImage);
         previwe_image_container = root.findViewById(R.id.previwe_image_container);
-
-
         cardContainer = root.findViewById(R.id.card_container);
 
-
-
         photoButton = root.findViewById(R.id.photo_button);
-        photoButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Handle photo button click
-                Toast.makeText(getActivity(), "Photo clicked", Toast.LENGTH_SHORT).show();
-                openGallery();
-            }
-        });
+        photoButton.setOnClickListener(v -> openGallery());
 
-        buttonRemoveImage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                imagePreview.setImageDrawable(null);
-                imagePreview.setVisibility(View.GONE);
-                buttonRemoveImage.setVisibility(View.GONE);
-                previwe_image_container.setVisibility(View.GONE);
-                selectedImageUri = null;
-            }
-        });
+        buttonRemoveImage.setOnClickListener(view -> clearSelectedImage());
 
         postButton = root.findViewById(R.id.post_button);
-
-
         postButton.setOnClickListener(v -> {
             String text = postTextInput.getText().toString().trim();
             if (text.isEmpty()) {
                 Toast.makeText(getActivity(), "Please enter post text", Toast.LENGTH_SHORT).show();
                 return;
             }
-            uploadPost(text);
+            if (editingPostId != -1) {
+                updatePostOnServer(editingPostId, text);
+                editingPostId = -1;
+            } else {
+                uploadPost(text);
+            }
         });
 
         fetchPosts();
-
-        // 2) find the ImageView *on that root view*…
-       // ImageView contactImage = root.findViewById(R.id.contactImage);
-       // contactImage.setImageResource(R.drawable.first);
-
-
-
-        // 3) return it
         return root;
     }
-    private void showPopupMenu(View view) {
-        PopupMenu popup = new PopupMenu(getActivity(), view);
-        popup.getMenuInflater().inflate(R.menu.posts_edit, popup.getMenu());
-        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-            public boolean onMenuItemClick(MenuItem item) {
-                int id = item.getItemId();
-                if (id == R.id.item1) { // Assuming 'item1' is the 'Edit' button
-                    Toast.makeText(getActivity(), "Edit option selected", Toast.LENGTH_SHORT).show();
-                    // Add your edit functionality here
-                    return true;
-                } else if (id == R.id.item3) { // Assuming 'item3' is the 'Delete' button
-                    Toast.makeText(getActivity(), "Delete option selected", Toast.LENGTH_SHORT).show();
-                    // Add your delete functionality here
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        });
-        popup.show();
-    }
-    private void customPopup(View anchorView) {
-        View menuView = LayoutInflater.from(getContext()).inflate(R.layout.custom_popup_menu, null);
-        PopupWindow popupWindow = new PopupWindow(menuView,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                true);
 
-        // Set elevation (optional for shadow)
-        popupWindow.setElevation(10);
-
-        // Click listeners
-        menuView.findViewById(R.id.menu_edit).setOnClickListener(v -> {
-            // Handle edit
-            popupWindow.dismiss();
-        });
-
-        menuView.findViewById(R.id.menu_delete).setOnClickListener(v -> {
-            // Handle delete
-            popupWindow.dismiss();
-        });
-
-        int offsetInDp = -12;
-        float density = getContext().getResources().getDisplayMetrics().density;
-        int offsetInPx = (int) (offsetInDp * density + 0.5f);
-
-        // Calculate horizontal offset to align with the more icon
-        int xOffset = -popupWindow.getContentView().getMeasuredWidth() + anchorView.getWidth();
-        // Show the popup below the anchor view
-        popupWindow.showAsDropDown(anchorView, xOffset, 0);
-    }
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             selectedImageUri = data.getData();
-
             try {
                 Bitmap bitmap;
-
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    // Use ImageDecoder for API 28+
                     ImageDecoder.Source source = ImageDecoder.createSource(requireContext().getContentResolver(), selectedImageUri);
                     bitmap = ImageDecoder.decodeBitmap(source);
                 } else {
-                    // Fallback for older versions
                     bitmap = MediaStore.Images.Media.getBitmap(requireContext().getContentResolver(), selectedImageUri);
                 }
-
-
                 imagePreview.setImageBitmap(bitmap);
                 imagePreview.setVisibility(View.VISIBLE);
                 buttonRemoveImage.setVisibility(View.VISIBLE);
                 previwe_image_container.setVisibility(View.VISIBLE);
-
             } catch (IOException e) {
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Failed to load image", Toast.LENGTH_SHORT).show();
             }
         }
     }
+
     private void uploadPost(String text) {
         MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
-
-        // Add text to the request
         builder.addFormDataPart("text", text);
-
-        // Add image if selected
         if (selectedImageUri != null) {
             String filePath = getRealPathFromUri(selectedImageUri);
-            if (filePath == null) {
-                Toast.makeText(getActivity(), "Unable to get file path", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            if (filePath == null) return;
             File file = new File(filePath);
             MediaType mediaType = MediaType.parse(getMimeType(filePath));
-            RequestBody fileBody = RequestBody.create(file, mediaType);
-            builder.addFormDataPart("picture", file.getName(), fileBody);
+            builder.addFormDataPart("picture", file.getName(), RequestBody.create(file, mediaType));
         }
-        // No else needed - we simply don't add a picture field if no image is selected
-
-        // Build the request body
         RequestBody requestBody = builder.build();
         Request request = new Request.Builder().url(UPLOAD_URL).post(requestBody).build();
-
-        // Send the request asynchronously
         client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
+            @Override public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(), "Upload failed", Toast.LENGTH_SHORT).show()
+                );
+            }
+            @Override public void onResponse(Call call, Response response) throws IOException {
                 requireActivity().runOnUiThread(() -> {
-                    Toast.makeText(getActivity(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Post uploaded successfully", Toast.LENGTH_SHORT).show();
+                        clearSelectedImage();
+                        postTextInput.setText("");
+                        fetchPosts();
+                    }
                 });
             }
+        });
+    }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String body = response.body().string();
+    private void updatePostOnServer(int postId, String updatedText) {
+        String url = BASE_URL + "/api/edit_post/" + postId;
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        builder.addFormDataPart("text", updatedText);
+        if (selectedImageUri != null) {
+            String filePath = getRealPathFromUri(selectedImageUri);
+            if (filePath != null) {
+                File file = new File(filePath);
+                MediaType mediaType = MediaType.parse(getMimeType(filePath));
+                builder.addFormDataPart("picture", file.getName(), RequestBody.create(file, mediaType));
+            }
+        }
+        RequestBody body = builder.build();
+        Request request = new Request.Builder().url(url).put(body).build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override public void onFailure(Call call, IOException e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(), "Update failed", Toast.LENGTH_SHORT).show()
+                );
+            }
+            @Override public void onResponse(Call call, Response response) throws IOException {
                 requireActivity().runOnUiThread(() -> {
-                    // Show success message
                     if (response.isSuccessful()) {
-                        Toast.makeText(getActivity(), "Post uploaded successfully", Toast.LENGTH_LONG).show();
-                        // Reset UI for a new post
-                        postTextInput.setText("");
+                        Toast.makeText(getActivity(), "Post updated", Toast.LENGTH_SHORT).show();
                         clearSelectedImage();
-                    } else {
-                        Toast.makeText(getActivity(), "Error: " + response.code() + " - " + body, Toast.LENGTH_LONG).show();
+                        postTextInput.setText("");
+                        fetchPosts();
+                    }
+                });
+            }
+        });
+    }
+
+    private void fetchPosts() {
+        cardContainer.removeAllViews();
+        Request request = new Request.Builder().url(POSTS_URL).get().build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override public void onFailure(Call call, IOException e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(), "Failed to fetch posts", Toast.LENGTH_SHORT).show()
+                );
+            }
+            @Override public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String json = response.body().string();
+                    JSONObject root = new JSONObject(json);
+                    JSONArray posts = root.getJSONArray("posts");
+                    requireActivity().runOnUiThread(() -> displayPosts(posts));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void displayPosts(JSONArray posts) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        cardContainer.removeAllViews();
+        for (int i = 0; i < posts.length(); i++) {
+            try {
+                JSONObject p = posts.getJSONObject(i);
+                String text = p.optString("text", "");
+                String rawPath = p.optString("filepath", null);
+                int postId = p.optInt("id", -1);
+
+                View item = inflater.inflate(R.layout.post_item, cardContainer, false);
+                TextView tvBody = item.findViewById(R.id.tvPostBody);
+                ImageView ivPostImg = item.findViewById(R.id.ivPostImage);
+                ImageView ivMore = item.findViewById(R.id.ivMore);
+
+                tvBody.setText(text);
+                ivMore.setOnClickListener(v -> customPopup(v, postId, p));
+
+                if (rawPath != null && !rawPath.equals("null") && !rawPath.isEmpty()) {
+                    String filename = rawPath.substring(rawPath.lastIndexOf("\\") + 1);
+                    String imageUrl = BASE_URL + "/uploads/" + filename;
+                    ivPostImg.setVisibility(View.VISIBLE);
+                    Picasso.get().load(imageUrl).fit().centerCrop().into(ivPostImg);
+                } else {
+                    ivPostImg.setVisibility(View.GONE);
+                }
+                cardContainer.addView(item);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void customPopup(View anchorView, int postId, JSONObject postObj) {
+        View menuView = LayoutInflater.from(getContext()).inflate(R.layout.custom_popup_menu, null);
+        PopupWindow popupWindow = new PopupWindow(menuView, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.setElevation(10);
+        menuView.findViewById(R.id.menu_edit).setOnClickListener(v -> {
+            prefillPostFields(postId, postObj);
+            popupWindow.dismiss();
+        });
+        menuView.findViewById(R.id.menu_delete).setOnClickListener(v -> {
+            deletePostFromServer(postId);
+            popupWindow.dismiss();
+        });
+        popupWindow.showAsDropDown(anchorView);
+    }
+
+    private void prefillPostFields(int postId, JSONObject postObj) {
+        String text = postObj.optString("text", "");
+        String rawPath = postObj.optString("filepath", null);
+        postTextInput.setText(text);
+        editingPostId = postId;
+        if (rawPath != null && !rawPath.equals("null") && !rawPath.isEmpty()) {
+            String filename = rawPath.substring(rawPath.lastIndexOf("\\") + 1);
+            String imageUrl = BASE_URL + "/uploads/" + filename;
+            Picasso.get().load(imageUrl).into(imagePreview);
+            imagePreview.setVisibility(View.VISIBLE);
+            buttonRemoveImage.setVisibility(View.VISIBLE);
+            previwe_image_container.setVisibility(View.VISIBLE);
+            selectedImageUri = null;
+        } else {
+            clearSelectedImage();
+        }
+    }
+
+    private void deletePostFromServer(int postId) {
+        String deleteUrl = BASE_URL + "/api/delete_post/" + postId;
+        Request request = new Request.Builder().url(deleteUrl).delete().build();
+        client.newCall(request).enqueue(new Callback() {
+            @Override public void onFailure(Call call, IOException e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(), "Delete failed", Toast.LENGTH_SHORT).show()
+                );
+            }
+            @Override public void onResponse(Call call, Response response) throws IOException {
+                requireActivity().runOnUiThread(() -> {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(getActivity(), "Post deleted", Toast.LENGTH_SHORT).show();
+                        fetchPosts();
                     }
                 });
             }
@@ -307,107 +327,12 @@ public class PostFragment extends Fragment {
             default: return "application/octet-stream";
         }
     }
+
     private void clearSelectedImage() {
         selectedImageUri = null;
         imagePreview.setImageDrawable(null);
         imagePreview.setVisibility(View.GONE);
         buttonRemoveImage.setVisibility(View.GONE);
         previwe_image_container.setVisibility(View.GONE);
-
     }
-    private void fetchPosts() {
-        // clear any old views
-        cardContainer.removeAllViews();
-
-        Request request = new Request.Builder()
-                .url(POSTS_URL)
-                .get()
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override public void onFailure(Call call, IOException e) {
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getActivity(),
-                                "Failed to fetch posts: " + e.getMessage(),
-                                Toast.LENGTH_SHORT).show()
-                );
-            }
-
-            @Override public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getActivity(),
-                                    "Error fetching posts: " + response.code(),
-                                    Toast.LENGTH_SHORT).show()
-                    );
-                    return;
-                }
-                try {
-                    String json = response.body().string();
-                    JSONObject root = new JSONObject(json);
-                    JSONArray posts = root.getJSONArray("posts");
-
-                    requireActivity().runOnUiThread(() ->
-                            displayPosts(posts)
-                    );
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    requireActivity().runOnUiThread(() ->
-                            Toast.makeText(getActivity(),
-                                    "Parse error",
-                                    Toast.LENGTH_SHORT).show()
-                    );
-                }
-            }
-        });
-    }
-
-    private void displayPosts(JSONArray posts) {
-        LayoutInflater inflater = LayoutInflater.from(getContext());
-        cardContainer.removeAllViews();
-
-        for (int i = 0; i < posts.length(); i++) {
-            try {
-                JSONObject p       = posts.getJSONObject(i);
-                String text        = p.optString("text", "");
-                String rawPath     = p.optString("filepath", null);
-
-                // 1) inflate the item
-                View   item        = inflater.inflate(R.layout.post_item, cardContainer, false);
-                TextView tvBody    = item.findViewById(R.id.tvPostBody);
-                ImageView ivPostImg= item.findViewById(R.id.ivPostImage);
-
-                tvBody.setText(text);
-
-                // 2) if filepath isn't null, extract the filename...
-                if (rawPath != null && !rawPath.equals("null") && !rawPath.isEmpty()) {
-                    // everything after the last backslash
-                    String filename = rawPath.substring(rawPath.lastIndexOf("\\") + 1);
-
-                    // 3) build your real URL:
-                    String imageUrl = BASE_URL + "/uploads/" + filename;
-                    Log.d("ImageURL", imageUrl);
-
-                    ivPostImg.setVisibility(View.VISIBLE);
-                    Picasso.get()
-                            .load(imageUrl)
-                            //.placeholder(R.drawable.placeholder)  // optional
-                           // .error(R.drawable.error)             // optional
-                            .fit()
-                            .centerCrop()
-                            .into(ivPostImg);
-
-                } else {
-                    ivPostImg.setVisibility(View.GONE);
-                }
-
-                cardContainer.addView(item);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-
 }

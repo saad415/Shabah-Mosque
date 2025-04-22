@@ -16,6 +16,7 @@
         android:padding="12dp">
 
         <!-- Header: icon + name + “more” button -->
+        <!-- Header: icon + name + “more” button -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,14 +29,30 @@
                 android:src="@drawable/mosque_icon"
                 android:layout_marginEnd="8dp"/>
 
-            <TextView
-                android:id="@+id/tvPageName"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Sahabah Mosque"
-                android:textStyle="bold"
-                android:textSize="16sp"/>
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvPageName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sahabah Mosque"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold"
+                    android:textSize="16sp"/>
+
+                <!-- Time goes here -->
+                <TextView
+                    android:id="@+id/tvPostTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Just now"
+                    android:textSize="12sp"
+                    android:textColor="#403E3E"/>
+            </LinearLayout>
 
             <ImageView
                 android:id="@+id/ivMore"
@@ -43,6 +60,7 @@
                 android:layout_height="24dp"
                 android:src="@drawable/ic_more"/>
         </LinearLayout>
+
 
         <!-- Body Text -->
         <TextView

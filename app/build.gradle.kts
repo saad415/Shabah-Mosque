@@ -56,5 +56,7 @@ dependencies {
     implementation ("com.wdullaer:materialdatetimepicker:4.2.3")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
     implementation ("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation ("com.squareup.picasso:picasso:2.71828")
+
 
 }

@@ -5,7 +5,9 @@ import os
 from get_prayer_times import get_prayer_times
 from update_prayer_time import update_prayer_time
 from upload_post import register_upload_route
-from get_posts import get_posts, get_posts1
+from get_posts import  get_posts1
+from delete_post import delete_post_by_id
+from edit_post import edit_post_by_id
 
 app = Flask(__name__)
 
@@ -36,6 +38,19 @@ def api_update_prayer(prayer_name):
 def api_get_posts():
     rows = get_posts1()
     return rows
+
+@app.route("/api/delete_post/<int:post_id>", methods=["DELETE"])
+def api_delete_post(post_id):
+    result = delete_post_by_id(post_id)
+    status_code = 200 if "message" in result else 500
+    return jsonify(result), status_code
+
+from edit_post import edit_post_by_id
+
+@app.route("/api/edit_post/<int:post_id>", methods=["PUT"])
+def api_edit_post(post_id):
+    result = edit_post_by_id(post_id)
+    return jsonify(result), (200 if "message" in result else 500)
 
 # === NEW: Serve uploaded images ===
 
