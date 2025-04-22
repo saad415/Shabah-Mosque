@@ -3,6 +3,7 @@ package com.example.mosque;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.ImageDecoder;
 import android.net.Uri;
@@ -13,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -26,8 +28,16 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import android.view.MenuItem;
 
+import java.io.File;
 import java.io.IOException;
-
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 public class PostFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -37,8 +47,12 @@ public class PostFragment extends Fragment {
 
     FrameLayout previwe_image_container;
     private ImageButton buttonRemoveImage;
-    LinearLayout photoButton;
+    LinearLayout photoButton, postButton;
     private Uri selectedImageUri;
+    private EditText postTextInput;
+    // Replace with your server URL
+    private static final String UPLOAD_URL = "http://192.168.178.29:5000/upload";
+    private OkHttpClient client = new OkHttpClient();
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -46,7 +60,7 @@ public class PostFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
         // 1) inflate your fragment layout
         View root = inflater.inflate(R.layout.fragment_posts, container, false);
-
+        postTextInput = root.findViewById(R.id.post_text_input);
         moreVctor = root.findViewById(R.id.imageView);
         moreVctor.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +92,22 @@ public class PostFragment extends Fragment {
                 previwe_image_container.setVisibility(View.GONE);
                 selectedImageUri = null;
             }
+        });
+
+        postButton = root.findViewById(R.id.post_button);
+
+
+        postButton.setOnClickListener(v -> {
+            String text = postTextInput.getText().toString().trim();
+            if (text.isEmpty()) {
+                Toast.makeText(getActivity(), "Please enter post text", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedImageUri == null) {
+                Toast.makeText(getActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            uploadPost(text, selectedImageUri);
         });
 
         // 2) find the ImageView *on that root view*…
@@ -175,4 +205,84 @@ public class PostFragment extends Fragment {
             }
         }
     }
+    private void uploadPost(String text, Uri imageUri) {
+        // Resolve real file path from URI
+        String filePath = getRealPathFromUri(imageUri);
+        if (filePath == null) {
+            Toast.makeText(getActivity(), "Unable to get file path", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        File file = new File(filePath);
+
+        MediaType mediaType = MediaType.parse(getMimeType(filePath));
+        RequestBody fileBody = RequestBody.create(file, mediaType);
+
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addFormDataPart("picture", file.getName(), fileBody)
+                .addFormDataPart("text", text)
+                .build();
+
+        Request request = new Request.Builder()
+                .url(UPLOAD_URL)
+                .post(requestBody)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                final String body = response.body().string();
+                requireActivity().runOnUiThread(() -> {
+                    if (response.isSuccessful()) {
+                        // Show server message
+                        Toast.makeText(getActivity(), "Post uploaded successfully", Toast.LENGTH_LONG).show();
+                        // Reset UI for new post
+                        postTextInput.setText("");
+                        clearSelectedImage();
+                    } else {
+                        Toast.makeText(getActivity(), "Error: " + response.code(), Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+    }
+
+    private String getRealPathFromUri(Uri uri) {
+        String[] projection = { MediaStore.Images.Media.DATA };
+        Cursor cursor = requireActivity().getContentResolver().query(uri, projection, null, null, null);
+        if (cursor != null) {
+            int idx = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            String path = cursor.getString(idx);
+            cursor.close();
+            return path;
+        }
+        return null;
+    }
+
+    private String getMimeType(String path) {
+        String extension = path.substring(path.lastIndexOf('.') + 1);
+        switch (extension.toLowerCase()) {
+            case "jpg": case "jpeg": return "image/jpeg";
+            case "png": return "image/png";
+            default: return "application/octet-stream";
+        }
+    }
+    private void clearSelectedImage() {
+        selectedImageUri = null;
+        imagePreview.setImageDrawable(null);
+        imagePreview.setVisibility(View.GONE);
+        buttonRemoveImage.setVisibility(View.GONE);
+        previwe_image_container.setVisibility(View.GONE);
+
+    }
+
 }

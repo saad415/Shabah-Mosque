@@ -12,7 +12,7 @@ def update_prayer_time(prayer_name: str, new_time: str):
 
     """
     # use UTC now in ISO format, or switch to local if you prefer
-    conn = sqlite3.connect("MyAppDB.db")  # Make sure this file is in same folder
+    conn = sqlite3.connect("database.db")  # Make sure this file is in same folder
     cur = conn.cursor()
     cur.execute(sql, [new_time])
     conn.commit()

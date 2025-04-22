@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 import sqlite3
 from get_prayer_times import get_prayer_times
 from update_prayer_time import update_prayer_time
+from upload_post import  register_upload_route
+
 
 app = Flask(__name__)
 
@@ -36,4 +38,5 @@ def api_update_prayer(prayer_name):
 
 
 if __name__ == "__main__":
+    register_upload_route(app)
     app.run(host="0.0.0.0", port=5000)

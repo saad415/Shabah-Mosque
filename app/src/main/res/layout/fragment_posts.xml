@@ -33,7 +33,7 @@
 
                 <!-- EditText for input -->
                 <EditText
-                    android:id="@+id/post_input"
+                    android:id="@+id/post_text_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@null"
@@ -141,6 +141,7 @@
                         app:cardUseCompatPadding="false">
 
                         <LinearLayout
+                            android:id="@+id/post_button"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:clickable="true"

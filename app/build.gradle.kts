@@ -55,5 +55,6 @@ dependencies {
     implementation ("com.android.volley:volley:1.2.1")
     implementation ("com.wdullaer:materialdatetimepicker:4.2.3")
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.9.3")
 
 }
