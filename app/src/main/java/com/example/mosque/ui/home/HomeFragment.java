@@ -9,6 +9,8 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Calendar;
+
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.icu.text.DateFormat;
 import android.icu.util.ULocale;
@@ -46,6 +48,7 @@ import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import com.google.android.material.card.MaterialCardView;
 
 public class HomeFragment extends Fragment {
 
@@ -61,6 +64,9 @@ public class HomeFragment extends Fragment {
     SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
 
     ImageButton btnEditFajrTime, btnEditDhuhrTime, btnEditAsrTime, btnEditMaghribTime, btnEditIshaTime;
+
+
+    private MaterialCardView fajr_Cardview, dhuhr_Cardview, asr_Cardview, maghrib_Cardview, isha_Cardview;
     Date now = new Date();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -76,6 +82,15 @@ public class HomeFragment extends Fragment {
         tvNextPrayerDate = root.findViewById(R.id.tvNextPrayerDate);
         setTvhijriDate();
         updateDate();
+
+        //MaterialCardView fajr_Cardview = (MaterialCardView) root.findViewById(R.id.fajr_Cardview);
+        fajr_Cardview = (MaterialCardView) root.findViewById(R.id.fajr_Cardview);
+        //dhuhr_Cardview = (MaterialCardView)  root.findViewById(R.id.dhuhr_Cardview);
+        //dhuhr_Cardview = root.findViewById(R.id.dhuhr_Cardview);
+        //asr_Cardview = root.findViewById(R.id.asr_Cardview);
+       // maghrib_Cardview = root.findViewById(R.id.margrib_Cardview);
+        //isha_Cardview = root.findViewById(R.id.isha_Cardview);
+
 
         tvFajrTime = root.findViewById(R.id.tvFajrTime);
         tvDhuhrTime   = root.findViewById(R.id.tvDhuhrTime);
@@ -145,6 +160,8 @@ public class HomeFragment extends Fragment {
 
         //final TextView textView = binding.textHome;
        // homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
+        fajr_Cardview.setStrokeColor(Color.RED);
+        fajr_Cardview.setStrokeWidth(10);
         return root;
     }
 
@@ -221,6 +238,9 @@ public class HomeFragment extends Fragment {
                                 tvFajrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajr.setTypeface(null, Typeface.BOLD);
                                 tvFajrTime.setTypeface(null, Typeface.BOLD);
+                                fajr_Cardview.setStrokeColor(Color.RED);
+                                fajr_Cardview.setStrokeWidth(10);  // in pixels
+
                             }
                             else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
                                 tvDhuhr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
