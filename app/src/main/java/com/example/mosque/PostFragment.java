@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +32,8 @@ import android.view.MenuItem;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.MediaType;
@@ -38,6 +42,12 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import com.squareup.picasso.Picasso;   // ← add Picasso dependency
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class PostFragment extends Fragment {
 
     private static final int PICK_IMAGE_REQUEST = 1;
@@ -51,8 +61,24 @@ public class PostFragment extends Fragment {
     private Uri selectedImageUri;
     private EditText postTextInput;
     // Replace with your server URL
-    private static final String UPLOAD_URL = "http://192.168.178.29:5000/upload";
-    private OkHttpClient client = new OkHttpClient();
+   // private static final String UPLOAD_URL = "http://192.168.178.29:5000/upload";
+    private static final String BASE_URL = "http://192.168.178.29:5000";
+    private static final String UPLOAD_URL = BASE_URL + "/upload";
+
+    private static final String POSTS_URL = BASE_URL + "/api/getposts";
+
+    //private OkHttpClient client = new OkHttpClient();
+
+
+    // Extended timeout for slower connections
+    private OkHttpClient client = new OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build();
+
+    private LinearLayout cardContainer;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -61,17 +87,22 @@ public class PostFragment extends Fragment {
         // 1) inflate your fragment layout
         View root = inflater.inflate(R.layout.fragment_posts, container, false);
         postTextInput = root.findViewById(R.id.post_text_input);
-        moreVctor = root.findViewById(R.id.imageView);
-        moreVctor.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        //moreVctor = root.findViewById(R.id.imageView);
+        //moreVctor.setOnClickListener(new View.OnClickListener() {
+        //    @Override
+        //    public void onClick(View view) {
                 //showPopupMenu(view);
-                customPopup(view);
-            }
-        });
+         //       customPopup(view);
+         //   }
+        // });
         imagePreview = root.findViewById(R.id.imagePreview);
         buttonRemoveImage = root.findViewById(R.id.buttonRemoveImage); // initialize
         previwe_image_container = root.findViewById(R.id.previwe_image_container);
+
+
+        cardContainer = root.findViewById(R.id.card_container);
+
+
 
         photoButton = root.findViewById(R.id.photo_button);
         photoButton.setOnClickListener(new View.OnClickListener() {
@@ -105,6 +136,8 @@ public class PostFragment extends Fragment {
             }
             uploadPost(text);
         });
+
+        fetchPosts();
 
         // 2) find the ImageView *on that root view*…
        // ImageView contactImage = root.findViewById(R.id.contactImage);
@@ -282,5 +315,99 @@ public class PostFragment extends Fragment {
         previwe_image_container.setVisibility(View.GONE);
 
     }
+    private void fetchPosts() {
+        // clear any old views
+        cardContainer.removeAllViews();
+
+        Request request = new Request.Builder()
+                .url(POSTS_URL)
+                .get()
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override public void onFailure(Call call, IOException e) {
+                requireActivity().runOnUiThread(() ->
+                        Toast.makeText(getActivity(),
+                                "Failed to fetch posts: " + e.getMessage(),
+                                Toast.LENGTH_SHORT).show()
+                );
+            }
+
+            @Override public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(),
+                                    "Error fetching posts: " + response.code(),
+                                    Toast.LENGTH_SHORT).show()
+                    );
+                    return;
+                }
+                try {
+                    String json = response.body().string();
+                    JSONObject root = new JSONObject(json);
+                    JSONArray posts = root.getJSONArray("posts");
+
+                    requireActivity().runOnUiThread(() ->
+                            displayPosts(posts)
+                    );
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(getActivity(),
+                                    "Parse error",
+                                    Toast.LENGTH_SHORT).show()
+                    );
+                }
+            }
+        });
+    }
+
+    private void displayPosts(JSONArray posts) {
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        cardContainer.removeAllViews();
+
+        for (int i = 0; i < posts.length(); i++) {
+            try {
+                JSONObject p       = posts.getJSONObject(i);
+                String text        = p.optString("text", "");
+                String rawPath     = p.optString("filepath", null);
+
+                // 1) inflate the item
+                View   item        = inflater.inflate(R.layout.post_item, cardContainer, false);
+                TextView tvBody    = item.findViewById(R.id.tvPostBody);
+                ImageView ivPostImg= item.findViewById(R.id.ivPostImage);
+
+                tvBody.setText(text);
+
+                // 2) if filepath isn't null, extract the filename...
+                if (rawPath != null && !rawPath.equals("null") && !rawPath.isEmpty()) {
+                    // everything after the last backslash
+                    String filename = rawPath.substring(rawPath.lastIndexOf("\\") + 1);
+
+                    // 3) build your real URL:
+                    String imageUrl = BASE_URL + "/uploads/" + filename;
+                    Log.d("ImageURL", imageUrl);
+
+                    ivPostImg.setVisibility(View.VISIBLE);
+                    Picasso.get()
+                            .load(imageUrl)
+                            //.placeholder(R.drawable.placeholder)  // optional
+                           // .error(R.drawable.error)             // optional
+                            .fit()
+                            .centerCrop()
+                            .into(ivPostImg);
+
+                } else {
+                    ivPostImg.setVisibility(View.GONE);
+                }
+
+                cardContainer.addView(item);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 
 }
