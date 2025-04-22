@@ -103,11 +103,7 @@ public class PostFragment extends Fragment {
                 Toast.makeText(getActivity(), "Please enter post text", Toast.LENGTH_SHORT).show();
                 return;
             }
-            if (selectedImageUri == null) {
-                Toast.makeText(getActivity(), "Please select an image", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            uploadPost(text, selectedImageUri);
+            uploadPost(text);
         });
 
         // 2) find the ImageView *on that root view*…
@@ -205,50 +201,52 @@ public class PostFragment extends Fragment {
             }
         }
     }
-    private void uploadPost(String text, Uri imageUri) {
-        // Resolve real file path from URI
-        String filePath = getRealPathFromUri(imageUri);
-        if (filePath == null) {
-            Toast.makeText(getActivity(), "Unable to get file path", Toast.LENGTH_SHORT).show();
-            return;
+    private void uploadPost(String text) {
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+
+        // Add text to the request
+        builder.addFormDataPart("text", text);
+
+        // Add image if selected
+        if (selectedImageUri != null) {
+            String filePath = getRealPathFromUri(selectedImageUri);
+            if (filePath == null) {
+                Toast.makeText(getActivity(), "Unable to get file path", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            File file = new File(filePath);
+            MediaType mediaType = MediaType.parse(getMimeType(filePath));
+            RequestBody fileBody = RequestBody.create(file, mediaType);
+            builder.addFormDataPart("picture", file.getName(), fileBody);
         }
-        File file = new File(filePath);
+        // No else needed - we simply don't add a picture field if no image is selected
 
-        MediaType mediaType = MediaType.parse(getMimeType(filePath));
-        RequestBody fileBody = RequestBody.create(file, mediaType);
+        // Build the request body
+        RequestBody requestBody = builder.build();
+        Request request = new Request.Builder().url(UPLOAD_URL).post(requestBody).build();
 
-        RequestBody requestBody = new MultipartBody.Builder()
-                .setType(MultipartBody.FORM)
-                .addFormDataPart("picture", file.getName(), fileBody)
-                .addFormDataPart("text", text)
-                .build();
-
-        Request request = new Request.Builder()
-                .url(UPLOAD_URL)
-                .post(requestBody)
-                .build();
-
+        // Send the request asynchronously
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                requireActivity().runOnUiThread(() ->
-                        Toast.makeText(getActivity(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+                requireActivity().runOnUiThread(() -> {
+                    Toast.makeText(getActivity(), "Upload failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String body = response.body().string();
                 requireActivity().runOnUiThread(() -> {
+                    // Show success message
                     if (response.isSuccessful()) {
-                        // Show server message
                         Toast.makeText(getActivity(), "Post uploaded successfully", Toast.LENGTH_LONG).show();
-                        // Reset UI for new post
+                        // Reset UI for a new post
                         postTextInput.setText("");
                         clearSelectedImage();
                     } else {
-                        Toast.makeText(getActivity(), "Error: " + response.code(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "Error: " + response.code() + " - " + body, Toast.LENGTH_LONG).show();
                     }
                 });
             }

@@ -25,6 +25,8 @@ def init_db():
 def register_upload_route(app):
     @app.route('/upload', methods=['POST'])
     def upload_post():
+        print("Request received:", request.form.keys())
+        
         if 'text' not in request.form:
             return jsonify({'error': 'Missing text field'}), 400
 
@@ -42,13 +44,19 @@ def register_upload_route(app):
                 path = os.path.join(UPLOAD_FOLDER, unique)
                 file.save(path)
 
-        with sqlite3.connect(DATABASE) as conn:
-            c = conn.cursor()
-            c.execute(
-                'INSERT INTO posts (text, filepath) VALUES (?, ?)',
-                (text, path)
-            )
-            conn.commit()
+        try:
+            with sqlite3.connect(DATABASE) as conn:
+                c = conn.cursor()
+                c.execute(
+                    'INSERT INTO posts (text, filepath) VALUES (?, ?)',
+                    (text, path)
+                )
+                conn.commit()
+        except Exception as e:
+            import traceback
+            print("Database error:", str(e))
+            print(traceback.format_exc())
+            return jsonify({'error': f'Database error: {str(e)}'}), 500
 
         return jsonify({
             'message': 'Post uploaded successfully',
