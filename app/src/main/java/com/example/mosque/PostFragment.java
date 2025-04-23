@@ -79,6 +79,12 @@ public class PostFragment extends Fragment {
         previwe_image_container = root.findViewById(R.id.previwe_image_container);
         cardContainer = root.findViewById(R.id.card_container);
 
+        // Check if user is admin
+        boolean isAdmin = NavigationActivity.isAdmin(requireContext());
+        View postCard = root.findViewById(R.id.post_card);
+        if (postCard != null) {
+            postCard.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
+        }
 
         photoButton = root.findViewById(R.id.photo_button);
         photoButton.setOnClickListener(v -> openGallery());
@@ -227,6 +233,8 @@ public class PostFragment extends Fragment {
     private void displayPosts(JSONArray posts) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         cardContainer.removeAllViews();
+        boolean isAdmin = NavigationActivity.isAdmin(requireContext());
+        
         for (int i = 0; i < posts.length(); i++) {
             try {
                 JSONObject p = posts.getJSONObject(i);
@@ -240,6 +248,7 @@ public class PostFragment extends Fragment {
                 ImageView ivMore = item.findViewById(R.id.ivMore);
 
                 tvBody.setText(text);
+                ivMore.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
                 ivMore.setOnClickListener(v -> customPopup(v, postId, p));
 
                 if (rawPath != null && !rawPath.equals("null") && !rawPath.isEmpty()) {
