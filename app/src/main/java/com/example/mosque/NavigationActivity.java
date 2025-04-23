@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -24,6 +25,8 @@ import com.google.android.material.navigation.NavigationBarView;
 public class NavigationActivity extends AppCompatActivity {
     private static final int ADMIN_TRIGGER_TAPS = 5;
     private int contactTapCount = 0;
+    private long lastContactClickTime = 0;
+    private static final long CLICK_TIMEOUT = 2000; // 2 seconds timeout
 
     ImageView logout_icon;
     @Override
@@ -33,7 +36,6 @@ public class NavigationActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Sahabah Mosque");
-
 
         logout_icon = findViewById(R.id.logout_icon);
         if (isAdmin(NavigationActivity.this)) {
@@ -46,7 +48,8 @@ public class NavigationActivity extends AppCompatActivity {
                 logoutAdmin();
                 Intent intent = getIntent();
                 finish();
-                startActivity(intent);            }
+                startActivity(intent);
+            }
         });
 
         BottomNavigationView bottomNav = findViewById(R.id.bottomNavigationView);
@@ -54,23 +57,31 @@ public class NavigationActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int itemId = item.getItemId();
+                long currentTime = System.currentTimeMillis();
 
                 if (itemId == R.id.item_one) {
+                    contactTapCount = 0;
                     Toast.makeText(NavigationActivity.this, "First Button Clicked", Toast.LENGTH_SHORT).show();
-                    //openFragment(new HomeFragment());    // ← add this line
-                    //getSupportFragmentManager().popBackStack();  // ← goes back to HomeFragment
                     openFragment(new HomeFragment());
                     return true;
                 } else if (itemId == R.id.item_two) {
+                    contactTapCount = 0;
                     Toast.makeText(NavigationActivity.this, "Second Button Clicked", Toast.LENGTH_SHORT).show();
-                    //openFragment(new HomeFragment());
-                    //main.setVisibility(View.GONE);
                     openFragment(new PostFragment());
-
                     return true;
                 } else if (itemId == R.id.item_three) {
+                    // Check if it's been too long since last contact click
+                    if (currentTime - lastContactClickTime > CLICK_TIMEOUT) {
+                        contactTapCount = 0;
+                    }
+                    
                     openFragment(new ContactFragment());
                     contactTapCount++;
+                    lastContactClickTime = currentTime;
+                    
+                    Log.d("TouchDebug", "Contact count: " + contactTapCount);
+                    Toast.makeText(NavigationActivity.this, "Contact count: " + contactTapCount, Toast.LENGTH_SHORT).show();
+                    
                     if (contactTapCount >= ADMIN_TRIGGER_TAPS) {
                         contactTapCount = 0;
                         showAdminLoginDialog();
@@ -91,7 +102,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     private void openFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)   // <-- use the activity’s container
+                .replace(R.id.fragment_container, fragment)   // <-- use the activity's container
                 .addToBackStack(null)
                 .commit();
     }
