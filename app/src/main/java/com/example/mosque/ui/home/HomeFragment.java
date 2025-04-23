@@ -266,6 +266,10 @@ public class HomeFragment extends Fragment {
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghrib.setTypeface(null, Typeface.BOLD);
                                 tvMaghribTime.setTypeface(null, Typeface.BOLD);
+                                maghrib_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                maghrib_Cardview.setStrokeWidth(10);
+                                // in pixels
+
                             } else {
                                 tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
