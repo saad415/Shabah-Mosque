@@ -9,6 +9,7 @@
     <!-- The main content layout -->
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
+        android:background="@android:color/white"
         android:layout_height="match_parent">
 
         <com.google.android.material.appbar.AppBarLayout
@@ -23,6 +24,9 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@drawable/toolbar_fade_gradient"
                 android:title="Sahabah Mosque"
+                android:letterSpacing="0.02"
+                android:fontFamily="sans-serif-medium"
+                android:elevation="6dp"
                 android:titleTextColor="@android:color/white"
                 app:popupTheme="@style/Theme.Mosque.PopupOverlay">
 
@@ -55,8 +59,8 @@
             android:layout_height="?attr/actionBarSize"
             android:layout_gravity="bottom"
             android:paddingBottom="16dp"
-            android:background="@color/purple_700"
-            app:itemIconTint="@color/white"
+            android:background="@drawable/bottom_nav_background"
+            app:itemIconTint="@color/teal_200"
             app:itemTextColor="@color/white"
             app:menu="@menu/bottom_nav_menu" />
 

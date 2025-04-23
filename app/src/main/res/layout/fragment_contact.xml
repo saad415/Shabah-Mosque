@@ -24,7 +24,10 @@
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
             android:src="@drawable/contact"
-            android:contentDescription="Mosque Interior" />
+            android:contentDescription="Mosque Interior"
+            app:srcCompat="@drawable/rounded_corners" />
+
+
 
         <!-- Address Card -->
         <androidx.cardview.widget.CardView
@@ -33,6 +36,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="8dp"
             app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/white"
             app:cardElevation="2dp">
 
             <LinearLayout
@@ -99,6 +103,7 @@
             android:layout_marginHorizontal="16dp"
             android:layout_marginVertical="8dp"
             app:cardCornerRadius="8dp"
+            app:cardBackgroundColor="@color/white"
             app:cardElevation="2dp">
 
             <LinearLayout
@@ -120,7 +125,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:text="Link"
-                    android:textColor="#03A9F4"
+                    android:textColor="@color/purple_700"
                     android:textSize="16sp"
                     android:clickable="true"
                     android:focusable="true" />
