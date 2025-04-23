@@ -30,7 +30,7 @@
         android:id="@+id/overlay"
         android:layout_width="0dp"
         android:layout_height="160dp"
-        android:background="#80000000"
+        android:background="@drawable/gradient_overlay"
         app:layout_constraintTop_toTopOf="@id/headerImage"
         app:layout_constraintStart_toStartOf="@id/headerImage"
         app:layout_constraintEnd_toEndOf="@id/headerImage"/>
@@ -237,6 +237,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="8dp"
                 app:cardElevation="4dp"
+                android:id="@+id/asr_Cardview"
                 android:layout_marginStart="4dp"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="12dp">
@@ -245,7 +246,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="64dp"
                     android:orientation="horizontal"
-                    android:id="@+id/asr_Cardview"
                     android:gravity="center_vertical"
                     android:paddingStart="16dp"
                     android:background="@android:color/white"

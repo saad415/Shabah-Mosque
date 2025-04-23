@@ -177,6 +177,9 @@ public class PostFragment extends Fragment {
                 builder.addFormDataPart("picture", file.getName(), RequestBody.create(file, mediaType));
             }
         }
+        if (selectedImageUri == null) {
+            builder.addFormDataPart("remove_image", "true");
+        }
         RequestBody body = builder.build();
         Request request = new Request.Builder().url(url).put(body).build();
         client.newCall(request).enqueue(new Callback() {

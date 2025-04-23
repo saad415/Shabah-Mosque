@@ -85,11 +85,10 @@ public class HomeFragment extends Fragment {
 
         //MaterialCardView fajr_Cardview = (MaterialCardView) root.findViewById(R.id.fajr_Cardview);
         fajr_Cardview = (MaterialCardView) root.findViewById(R.id.fajr_Cardview);
-        //dhuhr_Cardview = (MaterialCardView)  root.findViewById(R.id.dhuhr_Cardview);
-        //dhuhr_Cardview = root.findViewById(R.id.dhuhr_Cardview);
-        //asr_Cardview = root.findViewById(R.id.asr_Cardview);
-       // maghrib_Cardview = root.findViewById(R.id.margrib_Cardview);
-        //isha_Cardview = root.findViewById(R.id.isha_Cardview);
+        dhuhr_Cardview = (MaterialCardView)  root.findViewById(R.id.dhuhr_Cardview);
+        asr_Cardview = (MaterialCardView) root.findViewById(R.id.asr_Cardview);
+        maghrib_Cardview = root.findViewById(R.id.margrib_Cardview);
+        isha_Cardview = root.findViewById(R.id.isha_Cardview);
 
 
         tvFajrTime = root.findViewById(R.id.tvFajrTime);
@@ -160,8 +159,9 @@ public class HomeFragment extends Fragment {
 
         //final TextView textView = binding.textHome;
        // homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-        fajr_Cardview.setStrokeColor(Color.RED);
-        fajr_Cardview.setStrokeWidth(10);
+       // fajr_Cardview.setStrokeColor(Color.RED);
+       // fajr_Cardview.setStrokeWidth(10);
+
         return root;
     }
 
@@ -238,8 +238,9 @@ public class HomeFragment extends Fragment {
                                 tvFajrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajr.setTypeface(null, Typeface.BOLD);
                                 tvFajrTime.setTypeface(null, Typeface.BOLD);
-                                fajr_Cardview.setStrokeColor(Color.RED);
-                                fajr_Cardview.setStrokeWidth(10);  // in pixels
+                                fajr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                fajr_Cardview.setStrokeWidth(10);
+                                // in pixels
 
                             }
                             else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
@@ -247,11 +248,19 @@ public class HomeFragment extends Fragment {
                                 tvDhuhrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvDhuhr.setTypeface(null, Typeface.BOLD);
                                 tvDhuhrTime.setTypeface(null, Typeface.BOLD);
+                                dhuhr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                dhuhr_Cardview.setStrokeWidth(10);
+                                // in pixels
+
                             } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
                                 tvAsr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsr.setTypeface(null, Typeface.BOLD);
                                 tvAsrTime.setTypeface(null, Typeface.BOLD);
+                                asr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                asr_Cardview.setStrokeWidth(10);
+                                // in pixels
+
                             } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
                                 tvMaghrib.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -262,6 +271,10 @@ public class HomeFragment extends Fragment {
                                 tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvIsha.setTypeface(null, Typeface.BOLD);
                                 tvIshaTime.setTypeface(null, Typeface.BOLD);
+                                isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                isha_Cardview.setStrokeWidth(10);
+                                // in pixels
+
                             }
 
                         } catch (Exception e) {

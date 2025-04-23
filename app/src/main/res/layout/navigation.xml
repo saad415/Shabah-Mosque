@@ -21,12 +21,13 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary"
+                android:background="@drawable/toolbar_fade_gradient"
                 android:title="Sahabah Mosque"
                 android:titleTextColor="@android:color/white"
                 app:popupTheme="@style/Theme.Mosque.PopupOverlay">
 
-                <ImageView
+
+            <ImageView
                     android:id="@+id/logout_icon"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
