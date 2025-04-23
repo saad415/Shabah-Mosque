@@ -88,7 +88,7 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <TextView
-            android:id="@+id/tvAsrNameTime"
+            android:id="@+id/current_time_textview"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Asr 06:57 PM"
@@ -154,7 +154,27 @@
                         android:text="Fajr"
                         android:textColor="@android:color/black"
                         android:textSize="16sp" />
-
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_azan"
+                        android:contentDescription="Azan time" />
+                    <!-- Inside Fajr LinearLayout, just before tvFajrTime -->
+                    <TextView
+                        android:id="@+id/tvFajrIqama"
+                        android:text="Iqama: 06:50"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginEnd="8dp"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_namaz"
+                        android:contentDescription="Namaz time" />
                     <TextView
                         android:id="@+id/tvFajrTime"
                         android:layout_width="wrap_content"
@@ -208,7 +228,26 @@
                         android:id="@+id/tvDhuhr"
 
                         android:layout_weight="1"/>
-
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_azan"
+                        android:contentDescription="Azan time" />
+                    <TextView
+                        android:id="@+id/tvDhuhrIqama"
+                        android:text="Iqama: 06:50"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginEnd="8dp"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_namaz"
+                        android:contentDescription="Namaz time" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -261,7 +300,26 @@
                         android:id="@+id/tvAsr"
                         android:textSize="16sp"
                         android:layout_weight="1"/>
-
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_azan"
+                        android:contentDescription="Azan time" />
+                    <TextView
+                        android:id="@+id/tvAsrIqama"
+                        android:text="Iqama: 06:50"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginEnd="8dp"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_namaz"
+                        android:contentDescription="Namaz time" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -314,7 +372,27 @@
                         android:id="@+id/tvMaghrib"
 
                         android:layout_weight="1"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_azan"
+                        android:contentDescription="Azan time" />
 
+                    <TextView
+                        android:id="@+id/tvMaghribIqama"
+                        android:text="Iqama: 06:50"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginEnd="8dp"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_namaz"
+                        android:contentDescription="Namaz time" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -365,7 +443,26 @@
                         android:id="@+id/tvIsha"
 
                         android:layout_weight="1"/>
-
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_azan"
+                        android:contentDescription="Azan time" />
+                    <TextView
+                        android:id="@+id/tvIshaIqama"
+                        android:text="Iqama: 06:50"
+                        android:textSize="16sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/black"
+                        android:layout_marginEnd="8dp"/>
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginEnd="4dp"
+                        android:src="@drawable/ic_namaz"
+                        android:contentDescription="Namaz time" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

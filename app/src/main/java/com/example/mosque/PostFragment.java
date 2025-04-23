@@ -79,6 +79,7 @@ public class PostFragment extends Fragment {
         previwe_image_container = root.findViewById(R.id.previwe_image_container);
         cardContainer = root.findViewById(R.id.card_container);
 
+
         photoButton = root.findViewById(R.id.photo_button);
         photoButton.setOnClickListener(v -> openGallery());
 

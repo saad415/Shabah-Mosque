@@ -3,6 +3,7 @@ package com.example.mosque.ui.home;
 import static androidx.core.app.ActivityCompat.recreate;
 import static com.example.mosque.NavigationActivity.isAdmin;
 
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import java.io.OutputStream;
@@ -43,6 +44,7 @@ import com.example.mosque.R;
 import com.example.mosque.databinding.FragmentHomeBinding;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
@@ -54,7 +56,7 @@ public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
     private TextView tvhijriDate;
-    private TextView tvNextPrayerDate;
+    private TextView tvNextPrayerDate,  current_time_textview;
     private TextView tvFajrTime, tvDhuhrTime, tvAsrTime, tvMaghribTime, tvIshaTime;
     private TextView tvFajr, tvDhuhr, tvAsr, tvMaghrib, tvIsha;
     private DBHelper dbHelper;
@@ -65,9 +67,12 @@ public class HomeFragment extends Fragment {
 
     ImageButton btnEditFajrTime, btnEditDhuhrTime, btnEditAsrTime, btnEditMaghribTime, btnEditIshaTime;
 
+    private TextView tvFajrIqama, tvDhuhrIqama, tvAsrIqama, tvMaghribIqama, tvIshaIqama;
 
     private MaterialCardView fajr_Cardview, dhuhr_Cardview, asr_Cardview, maghrib_Cardview, isha_Cardview;
     Date now = new Date();
+    private Handler timeHandler = new Handler(Looper.getMainLooper());
+    private Runnable updateTimeRunnable;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -96,7 +101,13 @@ public class HomeFragment extends Fragment {
         tvAsrTime     = root.findViewById(R.id.tvAsrTime);
         tvMaghribTime = root.findViewById(R.id.tvMaghribTime);
         tvIshaTime    = root.findViewById(R.id.tvIshaTime);
+        tvFajrIqama = root.findViewById(R.id.tvFajrIqama);
+        tvDhuhrIqama = root.findViewById(R.id.tvDhuhrIqama);
+        tvAsrIqama = root.findViewById(R.id.tvAsrIqama);
+        tvMaghribIqama = root.findViewById(R.id.tvMaghribIqama);
+        tvIshaIqama = root.findViewById(R.id.tvIshaIqama);
 
+        current_time_textview = root.findViewById(R.id.current_time_textview);
         tvNextPrayerDate = root.findViewById(R.id.tvNextPrayerDate);
         tvFajr = root.findViewById(R.id.tvFajr);
         tvDhuhr = root.findViewById(R.id.tvDhuhr);
@@ -109,6 +120,17 @@ public class HomeFragment extends Fragment {
         btnEditAsrTime = root.findViewById(R.id.btnEditAsrTime);
         btnEditMaghribTime = root.findViewById(R.id.btnEditMaghribTime);
         btnEditIshaTime = root.findViewById(R.id.btnEditIshaTime);
+
+        updateTimeRunnable = new Runnable() {
+            @Override
+            public void run() {
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                String currentTime = sdf.format(new Date());
+                current_time_textview.setText(currentTime);
+                timeHandler.postDelayed(this, 60000); // updates every minute
+            }
+        };
+        timeHandler.post(updateTimeRunnable);
 
         if (isAdmin(getActivity())) {
             btnEditFajrTime.setVisibility(View.VISIBLE);
@@ -150,9 +172,9 @@ public class HomeFragment extends Fragment {
             }
         });
 
-
-
         getPrayerTimes_and_upadet_bolf();
+        setPrayerTimes();
+
         // 2) find the ImageView *on that root view*…
        // ImageView contactImage = root.findViewById(R.id.contactImage);
        // contactImage.setImageResource(R.drawable.first);
@@ -169,6 +191,8 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+        timeHandler.removeCallbacks(updateTimeRunnable);
+
     }
     private void setTvhijriDate() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
@@ -178,7 +202,7 @@ public class HomeFragment extends Fragment {
 
             // Get an ICU DateFormat in that locale
             DateFormat fmt = DateFormat.getDateInstance(
-                    DateFormat.LONG,    // e.g. “22 Shawwal 1446 AH”
+                    DateFormat.LONG,    // e.g. "22 Shawwal 1446 AH"
                     uLocale
             );
 
@@ -186,7 +210,7 @@ public class HomeFragment extends Fragment {
             String hijri = fmt.format(new Date());
             tvhijriDate.setText(hijri);
         } else {
-            tvhijriDate.setText("Requires API 24+");
+            tvhijriDate.setText("Requires API 24+");
         }
     }
     private void updateDate() {
@@ -236,8 +260,10 @@ public class HomeFragment extends Fragment {
                             if (currentTime.after(fajrTime) && currentTime.before(dhuhrTime)) {
                                 tvFajr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                tvFajrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajr.setTypeface(null, Typeface.BOLD);
                                 tvFajrTime.setTypeface(null, Typeface.BOLD);
+                                tvFajrIqama.setTypeface(null, Typeface.BOLD);
                                 fajr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 fajr_Cardview.setStrokeWidth(10);
                                 // in pixels
@@ -246,8 +272,10 @@ public class HomeFragment extends Fragment {
                             else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
                                 tvDhuhr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvDhuhrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                tvDhuhrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvDhuhr.setTypeface(null, Typeface.BOLD);
                                 tvDhuhrTime.setTypeface(null, Typeface.BOLD);
+                                tvDhuhrIqama.setTypeface(null, Typeface.BOLD);
                                 dhuhr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 dhuhr_Cardview.setStrokeWidth(10);
                                 // in pixels
@@ -255,8 +283,10 @@ public class HomeFragment extends Fragment {
                             } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
                                 tvAsr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                tvAsrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsr.setTypeface(null, Typeface.BOLD);
                                 tvAsrTime.setTypeface(null, Typeface.BOLD);
+                                tvAsrIqama.setTypeface(null, Typeface.BOLD);
                                 asr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 asr_Cardview.setStrokeWidth(10);
                                 // in pixels
@@ -264,8 +294,10 @@ public class HomeFragment extends Fragment {
                             } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
                                 tvMaghrib.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                tvMaghribIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghrib.setTypeface(null, Typeface.BOLD);
                                 tvMaghribTime.setTypeface(null, Typeface.BOLD);
+                                tvMaghribIqama.setTypeface(null, Typeface.BOLD);
                                 maghrib_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 maghrib_Cardview.setStrokeWidth(10);
                                 // in pixels
@@ -273,8 +305,10 @@ public class HomeFragment extends Fragment {
                             } else {
                                 tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                tvIshaIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvIsha.setTypeface(null, Typeface.BOLD);
                                 tvIshaTime.setTypeface(null, Typeface.BOLD);
+                                tvIshaIqama.setTypeface(null, Typeface.BOLD);
                                 isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 isha_Cardview.setStrokeWidth(10);
                                 // in pixels
@@ -373,4 +407,36 @@ public class HomeFragment extends Fragment {
             }
         }).start();
     }
+
+    public void setPrayerTimes() {
+        String url = "https://api.aladhan.com/v1/timingsByCity?city=Nuremberg&country=Germany&method=2";
+
+        RequestQueue queue = Volley.newRequestQueue(getContext());
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        JSONObject timings = response.getJSONObject("data").getJSONObject("timings");
+                        
+
+                        tvFajrIqama.setText(timings.getString("Fajr"));
+                        tvDhuhrIqama.setText(timings.getString("Dhuhr"));
+                        tvAsrIqama.setText(timings.getString("Asr"));
+                        tvMaghribIqama.setText(timings.getString("Maghrib"));
+                        tvIshaIqama.setText(timings.getString("Isha"));
+
+                        // Show a success message
+                        Toast.makeText(getContext(), "Prayer times updated successfully", Toast.LENGTH_SHORT).show();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Error parsing prayer times", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> {
+                    error.printStackTrace();
+                    Toast.makeText(getContext(), "Error fetching prayer times", Toast.LENGTH_SHORT).show();
+                }
+        );
+        queue.add(request);
+    }
+
 }
