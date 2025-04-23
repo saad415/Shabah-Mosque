@@ -409,7 +409,7 @@ public class HomeFragment extends Fragment {
     }
 
     public void setPrayerTimes() {
-        String url = "https://api.aladhan.com/v1/timingsByCity?city=Nuremberg&country=Germany&method=2";
+        String url = "https://api.aladhan.com/v1/timingsByCity/{date}?city=Nuremberg&country=Germany&method=3";
 
         RequestQueue queue = Volley.newRequestQueue(getContext());
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
