@@ -51,6 +51,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import com.google.android.material.card.MaterialCardView;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.content.Intent;
 
 public class HomeFragment extends Fragment {
 
@@ -73,6 +78,7 @@ public class HomeFragment extends Fragment {
     Date now = new Date();
     private Handler timeHandler = new Handler(Looper.getMainLooper());
     private Runnable updateTimeRunnable;
+    private AlertDialog noInternetDialog;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -172,8 +178,13 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        getPrayerTimes_and_upadet_bolf();
-        setPrayerTimes();
+        // Check internet connection when fragment is created
+        if (!isInternetAvailable()) {
+            showNoInternetDialog();
+        } else {
+            getPrayerTimes_and_upadet_bolf();
+            setPrayerTimes();
+        }
 
         // 2) find the ImageView *on that root view*…
        // ImageView contactImage = root.findViewById(R.id.contactImage);
@@ -188,12 +199,24 @@ public class HomeFragment extends Fragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        // Check internet connection when fragment resumes
+        if (!isInternetAvailable()) {
+            showNoInternetDialog();
+        }
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
+        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+            noInternetDialog.dismiss();
+        }
         binding = null;
         timeHandler.removeCallbacks(updateTimeRunnable);
-
     }
+
     private void setTvhijriDate() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             // Build a ULocale that uses the Umm‑al‑Qura calendar
@@ -437,6 +460,43 @@ public class HomeFragment extends Fragment {
                 }
         );
         queue.add(request);
+    }
+
+    private boolean isInternetAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity()
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        return false;
+    }
+
+    private void showNoInternetDialog() {
+        if (getActivity() == null) return;
+
+        if (noInternetDialog != null && noInternetDialog.isShowing()) {
+            return; // Don't show dialog if it's already showing
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("No Internet Connection")
+               .setMessage("Please connect to the internet to get prayer times.")
+               .setCancelable(false)
+               .setPositiveButton("Retry", (dialog, which) -> {
+                   if (isInternetAvailable()) {
+                       getPrayerTimes_and_upadet_bolf();
+                       setPrayerTimes();
+                   } else {
+                       showNoInternetDialog(); // Show dialog again if still no internet
+                   }
+               })
+               .setNegativeButton("Settings", (dialog, which) -> {
+                   startActivity(new Intent(android.provider.Settings.ACTION_WIRELESS_SETTINGS));
+               });
+
+        noInternetDialog = builder.create();
+        noInternetDialog.show();
     }
 
 }

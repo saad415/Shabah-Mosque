@@ -32,6 +32,12 @@ import androidx.fragment.app.Fragment;
 import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -230,6 +236,54 @@ public class PostFragment extends Fragment {
         });
     }
 
+    private String formatPostTime(String timeStr) {
+        if (timeStr == null || timeStr.trim().isEmpty()) {
+            return "";
+        }
+        try {
+            Log.d("PostFragment", "Attempting to parse time: " + timeStr);
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            inputFormat.setTimeZone(TimeZone.getTimeZone("UTC")); // Set input timezone to UTC
+            
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+            // Output formats will use device's default timezone
+            
+            Date postDate = inputFormat.parse(timeStr.trim());
+            if (postDate == null) {
+                Log.e("PostFragment", "Failed to parse date: " + timeStr);
+                return timeStr;
+            }
+
+            // Get today's date without time
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.HOUR_OF_DAY, 0);
+            today.set(Calendar.MINUTE, 0);
+            today.set(Calendar.SECOND, 0);
+            today.set(Calendar.MILLISECOND, 0);
+
+            // Get post date without time
+            Calendar postCal = Calendar.getInstance();
+            postCal.setTime(postDate);
+            postCal.set(Calendar.HOUR_OF_DAY, 0);
+            postCal.set(Calendar.MINUTE, 0);
+            postCal.set(Calendar.SECOND, 0);
+            postCal.set(Calendar.MILLISECOND, 0);
+
+            String formattedTime = timeFormat.format(postDate);
+            Log.d("PostFragment", "Formatted time: " + formattedTime);
+            
+            if (postCal.getTime().equals(today.getTime())) {
+                return "Today " + formattedTime;
+            } else {
+                return dateFormat.format(postDate) + " " + formattedTime;
+            }
+        } catch (ParseException e) {
+            Log.e("PostFragment", "Error parsing date: " + e.getMessage());
+            return timeStr;
+        }
+    }
+
     private void displayPosts(JSONArray posts) {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         cardContainer.removeAllViews();
@@ -241,13 +295,23 @@ public class PostFragment extends Fragment {
                 String text = p.optString("text", "");
                 String rawPath = p.optString("filepath", null);
                 int postId = p.optInt("id", -1);
+                String time = p.optString("time ", "");
+                Log.d("PostFragment", "Raw time value: " + time);
+                Log.d("PostFragment", "Formatted time: " + formatPostTime(time));
 
                 View item = inflater.inflate(R.layout.post_item, cardContainer, false);
                 TextView tvBody = item.findViewById(R.id.tvPostBody);
+                TextView tvPostTime = item.findViewById(R.id.tvPostTime);
                 ImageView ivPostImg = item.findViewById(R.id.ivPostImage);
                 ImageView ivMore = item.findViewById(R.id.ivMore);
 
                 tvBody.setText(text);
+                if (time.isEmpty()) {
+                    tvPostTime.setVisibility(View.GONE);
+                } else {
+                    tvPostTime.setVisibility(View.VISIBLE);
+                    tvPostTime.setText(formatPostTime(time));
+                }
                 ivMore.setVisibility(isAdmin ? View.VISIBLE : View.GONE);
                 ivMore.setOnClickListener(v -> customPopup(v, postId, p));
 
