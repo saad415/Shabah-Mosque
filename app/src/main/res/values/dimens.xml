@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
@@ -5,4 +6,31 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    
+    <!-- Common dimensions -->
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">14sp</dimen>
+    <dimen name="text_size_large">16sp</dimen>
+    <dimen name="text_size_xlarge">18sp</dimen>
+    
+    <!-- Spacing -->
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    
+    <!-- Image sizes -->
+    <dimen name="image_size_small">48dp</dimen>
+    <dimen name="image_size_medium">64dp</dimen>
+    <dimen name="image_size_large">96dp</dimen>
+
+    <!-- Navigation specific dimensions -->
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="nav_drawer_width_small">240dp</dimen>
+    <dimen name="nav_drawer_width_large">320dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="toolbar_height_small">48dp</dimen>
+    <dimen name="toolbar_height_large">64dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="bottom_nav_height_small">48dp</dimen>
+    <dimen name="bottom_nav_height_large">64dp</dimen>
 </resources>
