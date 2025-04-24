@@ -36,9 +36,9 @@ def edit_post_by_id(post_id):
                 new_filepath = None
 
             if file or remove_image:
-                c.execute("UPDATE posts SET text = ?, filepath = ? WHERE id = ?", (text, new_filepath, post_id))
+                c.execute("UPDATE posts SET text = ?, filepath = ?, time = CURRENT_TIMESTAMP WHERE id = ?", (text, new_filepath, post_id))
             else:
-                c.execute("UPDATE posts SET text = ? WHERE id = ?", (text, post_id))
+                c.execute("UPDATE posts SET text = ?, time = CURRENT_TIMESTAMP WHERE id = ?", (text, post_id))
 
             conn.commit()
         return {"message": "Post updated"}
