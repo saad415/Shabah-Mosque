@@ -27,6 +27,8 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.PopupWindow;
+import android.view.Gravity;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -56,6 +58,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.content.Intent;
+import android.widget.ImageView;
 
 public class HomeFragment extends Fragment {
 
@@ -79,6 +82,8 @@ public class HomeFragment extends Fragment {
     private Handler timeHandler = new Handler(Looper.getMainLooper());
     private Runnable updateTimeRunnable;
     private AlertDialog noInternetDialog;
+    private PopupWindow tooltipWindow;
+    private View tooltipView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -186,6 +191,59 @@ public class HomeFragment extends Fragment {
             setPrayerTimes();
         }
 
+        // Initialize tooltip
+        tooltipView = inflater.inflate(R.layout.tooltip_layout, null);
+        tooltipWindow = new PopupWindow(
+            tooltipView,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            false
+        );
+        tooltipWindow.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+        tooltipWindow.setOutsideTouchable(true);
+
+        // Find all azan icons and set click listeners
+        ImageView azanFajr = root.findViewById(R.id.azan_icon_fajr);
+        ImageView azanDhuhr = root.findViewById(R.id.azan_icon_dhuhr);
+        ImageView azanAsr = root.findViewById(R.id.azan_icon_asr);
+        ImageView azanMaghrib = root.findViewById(R.id.azan_icon_maghrib);
+        ImageView azanIsha = root.findViewById(R.id.azan_icon_isha);
+
+        // Find all mosque icons
+        ImageView mosqueFajr = root.findViewById(R.id.mosque_icon_fajr);
+        ImageView mosqueDhuhr = root.findViewById(R.id.mosque_icon_dhuhr);
+        ImageView mosqueAsr = root.findViewById(R.id.mosque_icon_asr);
+        ImageView mosqueMaghrib = root.findViewById(R.id.mosque_icon_maghrib);
+        ImageView mosqueIsha = root.findViewById(R.id.mosque_icon_isha);
+
+        // Set click listeners for azan icons
+        View.OnClickListener azanClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTooltip(v, "Adhan Time");
+            }
+        };
+
+        // Set click listeners for mosque icons
+        View.OnClickListener mosqueClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTooltip(v, "Namaz Time");
+            }
+        };
+
+        azanFajr.setOnClickListener(azanClickListener);
+        azanDhuhr.setOnClickListener(azanClickListener);
+        azanAsr.setOnClickListener(azanClickListener);
+        azanMaghrib.setOnClickListener(azanClickListener);
+        azanIsha.setOnClickListener(azanClickListener);
+
+        mosqueFajr.setOnClickListener(mosqueClickListener);
+        mosqueDhuhr.setOnClickListener(mosqueClickListener);
+        mosqueAsr.setOnClickListener(mosqueClickListener);
+        mosqueMaghrib.setOnClickListener(mosqueClickListener);
+        mosqueIsha.setOnClickListener(mosqueClickListener);
+
         // 2) find the ImageView *on that root view*…
        // ImageView contactImage = root.findViewById(R.id.contactImage);
        // contactImage.setImageResource(R.drawable.first);
@@ -215,6 +273,11 @@ public class HomeFragment extends Fragment {
         }
         binding = null;
         timeHandler.removeCallbacks(updateTimeRunnable);
+        if (tooltipWindow != null && tooltipWindow.isShowing()) {
+            tooltipWindow.dismiss();
+        }
+        tooltipWindow = null;
+        tooltipView = null;
     }
 
     private void setTvhijriDate() {
@@ -497,6 +560,36 @@ public class HomeFragment extends Fragment {
 
         noInternetDialog = builder.create();
         noInternetDialog.show();
+    }
+
+    private void showTooltip(View anchorView, String message) {
+        if (tooltipWindow != null && tooltipView != null) {
+            // Set the tooltip message
+            TextView tooltipText = tooltipView.findViewById(R.id.tooltip_text);
+            tooltipText.setText(message);
+            
+            // Calculate position for tooltip
+            int[] location = new int[2];
+            anchorView.getLocationOnScreen(location);
+            
+            // Show tooltip above the icon
+            tooltipWindow.showAtLocation(
+                anchorView,
+                Gravity.NO_GRAVITY,
+                location[0] + anchorView.getWidth() / 2,
+                location[1] - tooltipView.getHeight()
+            );
+
+            // Auto-dismiss after 2 seconds
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if (tooltipWindow != null && tooltipWindow.isShowing()) {
+                        tooltipWindow.dismiss();
+                    }
+                }
+            }, 2000);
+        }
     }
 
 }

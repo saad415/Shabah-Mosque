@@ -158,10 +158,12 @@
                     android:textColor="@android:color/black"
                     android:textSize="16sp" />
                 <ImageView
+                    android:id="@+id/azan_icon_fajr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_azan"
+                    android:tooltipText="Adhan"
                     android:contentDescription="Azan time" />
                 <!-- Inside Fajr LinearLayout, just before tvFajrTime -->
                 <TextView
@@ -173,6 +175,7 @@
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="8dp"/>
                 <ImageView
+                    android:id="@+id/mosque_icon_fajr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
@@ -231,10 +234,12 @@
 
                     android:layout_weight="1"/>
                 <ImageView
+                    android:id="@+id/azan_icon_dhuhr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_azan"
+                    android:tooltipText="Adhan"
                     android:contentDescription="Azan time" />
                 <TextView
                     android:id="@+id/tvDhuhrIqama"
@@ -245,6 +250,7 @@
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="8dp"/>
                 <ImageView
+                    android:id="@+id/mosque_icon_dhuhr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
@@ -302,10 +308,12 @@
                     android:textSize="16sp"
                     android:layout_weight="1"/>
                 <ImageView
+                    android:id="@+id/azan_icon_asr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_azan"
+                    android:tooltipText="Adhan"
                     android:contentDescription="Azan time" />
                 <TextView
                     android:id="@+id/tvAsrIqama"
@@ -316,6 +324,7 @@
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="8dp"/>
                 <ImageView
+                    android:id="@+id/mosque_icon_asr"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
@@ -374,10 +383,12 @@
 
                     android:layout_weight="1"/>
                 <ImageView
+                    android:id="@+id/azan_icon_maghrib"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_azan"
+                    android:tooltipText="Adhan"
                     android:contentDescription="Azan time" />
 
                 <TextView
@@ -389,6 +400,7 @@
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="8dp"/>
                 <ImageView
+                    android:id="@+id/mosque_icon_maghrib"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
@@ -447,10 +459,12 @@
 
                     android:layout_weight="1"/>
                 <ImageView
+                    android:id="@+id/azan_icon_isha"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
                     android:src="@drawable/ic_azan"
+                    android:tooltipText="Adhan"
                     android:contentDescription="Azan time" />
                 <TextView
                     android:id="@+id/tvIshaIqama"
@@ -461,6 +475,7 @@
                     android:textColor="@android:color/black"
                     android:layout_marginEnd="8dp"/>
                 <ImageView
+                    android:id="@+id/mosque_icon_isha"
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:layout_marginEnd="4dp"
