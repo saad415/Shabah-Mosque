@@ -84,6 +84,7 @@ public class HomeFragment extends Fragment {
     private AlertDialog noInternetDialog;
     private PopupWindow tooltipWindow;
     private View tooltipView;
+    private String sunriseTimeStr = null;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -383,15 +384,21 @@ public class HomeFragment extends Fragment {
                                 Toast.makeText(getActivity(), "Error updating local database", Toast.LENGTH_SHORT).show();
                             }
 
-                            Date fajrTime = sdf.parse(tvFajrTime.getText().toString());
-                            Date dhuhrTime = sdf.parse(tvDhuhrTime.getText().toString());
-                            Date asrTime = sdf.parse(tvAsrTime.getText().toString());
-                            Date magTime = sdf.parse(tvMaghribTime.getText().toString());
-                            Date ishaTime = sdf.parse(tvIshaTime.getText().toString());
+                            // Parse Iqama times instead of prayer times
+                            Date fajrIqamaTime = sdf.parse(tvFajrIqama.getText().toString());
+                            Date dhuhrIqamaTime = sdf.parse(tvDhuhrIqama.getText().toString());
+                            Date asrIqamaTime = sdf.parse(tvAsrIqama.getText().toString());
+                            Date maghribIqamaTime = sdf.parse(tvMaghribIqama.getText().toString());
+                            Date ishaIqamaTime = sdf.parse(tvIshaIqama.getText().toString());
                             String currentTimeStr = sdf.format(now);
                             Date currentTime = sdf.parse(currentTimeStr);
 
-                            if (currentTime.after(fajrTime) && currentTime.before(dhuhrTime)) {
+                            // Highlight Fajr only if current time is before sunrise
+                            Date sunriseTime = null;
+                            if (sunriseTimeStr != null) {
+                                sunriseTime = sdf.parse(sunriseTimeStr);
+                            }
+                            if (sunriseTime != null && currentTime.before(sunriseTime)) {
                                 tvFajr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvFajrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -401,7 +408,7 @@ public class HomeFragment extends Fragment {
                                 fajr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 fajr_Cardview.setStrokeWidth(10);
                             }
-                            else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
+                            else if (currentTime.after(dhuhrIqamaTime) && currentTime.before(asrIqamaTime)) {
                                 tvDhuhr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvDhuhrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvDhuhrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -410,7 +417,7 @@ public class HomeFragment extends Fragment {
                                 tvDhuhrIqama.setTypeface(null, Typeface.BOLD);
                                 dhuhr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 dhuhr_Cardview.setStrokeWidth(10);
-                            } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
+                            } else if (currentTime.after(asrIqamaTime) && currentTime.before(maghribIqamaTime)) {
                                 tvAsr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -419,7 +426,7 @@ public class HomeFragment extends Fragment {
                                 tvAsrIqama.setTypeface(null, Typeface.BOLD);
                                 asr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 asr_Cardview.setStrokeWidth(10);
-                            } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
+                            } else if (currentTime.after(maghribIqamaTime) && currentTime.before(ishaIqamaTime)) {
                                 tvMaghrib.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghribIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -429,14 +436,20 @@ public class HomeFragment extends Fragment {
                                 maghrib_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 maghrib_Cardview.setStrokeWidth(10);
                             } else {
-                                tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvIshaIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvIsha.setTypeface(null, Typeface.BOLD);
-                                tvIshaTime.setTypeface(null, Typeface.BOLD);
-                                tvIshaIqama.setTypeface(null, Typeface.BOLD);
-                                isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                isha_Cardview.setStrokeWidth(10);
+                                // Highlight Isha only if current time is before midnight
+                                SimpleDateFormat midnightFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                                Date midnight = midnightFormat.parse("00:00");
+                                // If current time is before midnight (i.e., still today)
+                                if (currentTime.before(midnight)) {
+                                    tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                    tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                    tvIshaIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                    tvIsha.setTypeface(null, Typeface.BOLD);
+                                    tvIshaTime.setTypeface(null, Typeface.BOLD);
+                                    tvIshaIqama.setTypeface(null, Typeface.BOLD);
+                                    isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
+                                    isha_Cardview.setStrokeWidth(10);
+                                }
                             }
 
                         } catch (Exception e) {
@@ -541,6 +554,11 @@ public class HomeFragment extends Fragment {
                 response -> {
                     try {
                         JSONObject timings = response.getJSONObject("data").getJSONObject("timings");
+                        
+                        // Get sunrise time and show toast
+                        String sunriseTime = timings.getString("Sunrise");
+                        sunriseTimeStr = sunriseTime;
+                        Toast.makeText(getContext(), "Sunrise time: " + sunriseTime, Toast.LENGTH_LONG).show();
                         
                         // Update iqama times from API
                         String fajrIqama = timings.getString("Fajr");

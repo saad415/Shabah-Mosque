@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -80,7 +82,7 @@ public class NavigationActivity extends AppCompatActivity {
                     lastContactClickTime = currentTime;
                     
                     Log.d("TouchDebug", "Contact count: " + contactTapCount);
-                    Toast.makeText(NavigationActivity.this, "Contact count: " + contactTapCount, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(NavigationActivity.this, "Contact count: " + contactTapCount, Toast.LENGTH_SHORT).show();
                     
                     if (contactTapCount >= ADMIN_TRIGGER_TAPS) {
                         contactTapCount = 0;
@@ -107,6 +109,11 @@ public class NavigationActivity extends AppCompatActivity {
                 .commit();
     }
     private void showAdminLoginDialog() {
+        if (!isNetworkAvailable()) {
+            Toast.makeText(this, "No internet connection. Admin login requires internet access.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
         View v = getLayoutInflater().inflate(R.layout.dialog_admin_login, null);
         EditText etUser = v.findViewById(R.id.et_username);
         EditText etPass = v.findViewById(R.id.et_password);
@@ -128,6 +135,16 @@ public class NavigationActivity extends AppCompatActivity {
                 .setNegativeButton("Cancel", null)
                 .show();
     }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+        }
+        return false;
+    }
+
     private void grantAdmin() {
         // Option A) Static flag on your Application subclass:
         // ((MyApp)getApplication()).isAdmin = true;

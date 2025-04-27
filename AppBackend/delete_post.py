@@ -1,6 +1,5 @@
-# delete_post.py
-
 import sqlite3
+import logging
 
 def delete_post_by_id(post_id):
     DATABASE = "database.db"
@@ -11,4 +10,5 @@ def delete_post_by_id(post_id):
             conn.commit()
         return {"message": "Deleted successfully"}
     except Exception as e:
-        return {"error": str(e)}
+        logging.error(f"Delete post error: {e}")
+        return {"error": "Internal server error"}

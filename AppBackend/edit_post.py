@@ -1,7 +1,8 @@
-# edit_post.py
 import sqlite3
 import os
+import logging
 from flask import request
+from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -14,8 +15,6 @@ def edit_post_by_id(post_id):
 
         with sqlite3.connect("database.db") as conn:
             c = conn.cursor()
-
-            # Get current filepath to delete the file if needed
             c.execute("SELECT filepath FROM posts WHERE id = ?", (post_id,))
             current_path = c.fetchone()
             current_path = current_path[0] if current_path else None
@@ -23,11 +22,10 @@ def edit_post_by_id(post_id):
             new_filepath = current_path
 
             if file:
-                filename = file.filename
+                filename = secure_filename(file.filename)
                 new_filepath = os.path.join(UPLOAD_FOLDER, filename)
                 file.save(new_filepath)
 
-                # Delete old file if new one is uploaded
                 if current_path and os.path.exists(current_path):
                     os.remove(current_path)
 
@@ -43,4 +41,5 @@ def edit_post_by_id(post_id):
             conn.commit()
         return {"message": "Post updated"}
     except Exception as e:
-        return {"error": str(e)}
+        logging.error(f"Edit post error: {e}")
+        return {"error": "Internal server error"}
