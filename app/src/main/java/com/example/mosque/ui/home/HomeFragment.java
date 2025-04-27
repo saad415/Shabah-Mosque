@@ -185,7 +185,8 @@ public class HomeFragment extends Fragment {
 
         // Check internet connection when fragment is created
         if (!isInternetAvailable()) {
-            showNoInternetDialog();
+            //showNoInternetDialog();
+            getPrayerTimes_lcoal_database();
         } else {
             getPrayerTimes_and_upadet_bolf();
             setPrayerTimes();
@@ -261,7 +262,8 @@ public class HomeFragment extends Fragment {
         super.onResume();
         // Check internet connection when fragment resumes
         if (!isInternetAvailable()) {
-            showNoInternetDialog();
+            // showNoInternetDialog();
+            getPrayerTimes_lcoal_database();
         }
     }
 
@@ -305,9 +307,34 @@ public class HomeFragment extends Fragment {
         String formattedDate = dateFormat.format(cal.getTime());
         tvNextPrayerDate.setText( formattedDate);
     }
-    private void getPrayerTimes_and_upadet_bolf() {
+    private void getPrayerTimes_lcoal_database() {
         dbHelper = new DBHelper(getActivity());
         PrayerTimes times = dbHelper.getPrayerTimes();
+
+        // Always update UI with cached data first
+        if (times != null) {
+            tvFajrTime.setText(times.getFajr());
+            tvDhuhrTime.setText(times.getDhuhr());
+            tvAsrTime.setText(times.getAsr());
+            tvMaghribTime.setText(times.getMagrib());
+            tvIshaTime.setText(times.getIsha());
+            
+            // Update the UI with the cached iqama times
+            tvFajrIqama.setText(times.getFajrIqama());
+            tvDhuhrIqama.setText(times.getDhuhrIqama());
+            tvAsrIqama.setText(times.getAsrIqama());
+            tvMaghribIqama.setText(times.getMagribIqama());
+            tvIshaIqama.setText(times.getIshaIqama());
+        } else {
+            // If no data exists, show error message
+            Toast.makeText(getActivity(), "No prayer times available in local database", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void getPrayerTimes_and_upadet_bolf() {
+        // Initialize dbHelper if it's null
+        if (dbHelper == null) {
+            dbHelper = new DBHelper(getActivity());
+        }
 
         RequestQueue queue = Volley.newRequestQueue(getActivity());
         //getting data from sqlite localhost
@@ -334,6 +361,27 @@ public class HomeFragment extends Fragment {
                             tvMaghribTime.setText(obj.getString("magrib"));
                             tvIshaTime.setText(obj.getString("isha"));
 
+                            // Save to database (cache)
+                            String fajr = obj.getString("fajr");
+                            String dhuhr = obj.getString("dhuhr");
+                            String asr = obj.getString("asr");
+                            String maghrib = obj.getString("magrib");
+                            String isha = obj.getString("isha");
+                            String updatedAt = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+                            
+                            // Ensure dbHelper is not null before updating
+                            if (dbHelper != null) {
+                                dbHelper.updatePrayerTimes(fajr, dhuhr, asr, maghrib, isha,
+                                        tvFajrIqama.getText().toString(),
+                                        tvDhuhrIqama.getText().toString(),
+                                        tvAsrIqama.getText().toString(),
+                                        tvMaghribIqama.getText().toString(),
+                                        tvIshaIqama.getText().toString(),
+                                        updatedAt);
+                            } else {
+                                Log.e("HomeFragment", "dbHelper is null when trying to update prayer times");
+                                Toast.makeText(getActivity(), "Error updating local database", Toast.LENGTH_SHORT).show();
+                            }
 
                             Date fajrTime = sdf.parse(tvFajrTime.getText().toString());
                             Date dhuhrTime = sdf.parse(tvDhuhrTime.getText().toString());
@@ -352,8 +400,6 @@ public class HomeFragment extends Fragment {
                                 tvFajrIqama.setTypeface(null, Typeface.BOLD);
                                 fajr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 fajr_Cardview.setStrokeWidth(10);
-                                // in pixels
-
                             }
                             else if (currentTime.after(dhuhrTime) && currentTime.before(asrTime)) {
                                 tvDhuhr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -364,8 +410,6 @@ public class HomeFragment extends Fragment {
                                 tvDhuhrIqama.setTypeface(null, Typeface.BOLD);
                                 dhuhr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 dhuhr_Cardview.setStrokeWidth(10);
-                                // in pixels
-
                             } else if (currentTime.after(asrTime) && currentTime.before(magTime)) {
                                 tvAsr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvAsrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -375,8 +419,6 @@ public class HomeFragment extends Fragment {
                                 tvAsrIqama.setTypeface(null, Typeface.BOLD);
                                 asr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 asr_Cardview.setStrokeWidth(10);
-                                // in pixels
-
                             } else if (currentTime.after(magTime) && currentTime.before(ishaTime)) {
                                 tvMaghrib.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -386,8 +428,6 @@ public class HomeFragment extends Fragment {
                                 tvMaghribIqama.setTypeface(null, Typeface.BOLD);
                                 maghrib_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 maghrib_Cardview.setStrokeWidth(10);
-                                // in pixels
-
                             } else {
                                 tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
@@ -397,8 +437,6 @@ public class HomeFragment extends Fragment {
                                 tvIshaIqama.setTypeface(null, Typeface.BOLD);
                                 isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
                                 isha_Cardview.setStrokeWidth(10);
-                                // in pixels
-
                             }
 
                         } catch (Exception e) {
@@ -478,6 +516,7 @@ public class HomeFragment extends Fragment {
 
                         Toast.makeText(getActivity(), "Time updated to " + time, Toast.LENGTH_SHORT).show();
                         recreate(getActivity());
+
                     } else {
                         Toast.makeText(getActivity(), "Update failed: " + responseCode, Toast.LENGTH_SHORT).show();
                     }
@@ -503,12 +542,37 @@ public class HomeFragment extends Fragment {
                     try {
                         JSONObject timings = response.getJSONObject("data").getJSONObject("timings");
                         
+                        // Update iqama times from API
+                        String fajrIqama = timings.getString("Fajr");
+                        String dhuhrIqama = timings.getString("Dhuhr");
+                        String asrIqama = timings.getString("Asr");
+                        String maghribIqama = timings.getString("Maghrib");
+                        String ishaIqama = timings.getString("Isha");
 
-                        tvFajrIqama.setText(timings.getString("Fajr"));
-                        tvDhuhrIqama.setText(timings.getString("Dhuhr"));
-                        tvAsrIqama.setText(timings.getString("Asr"));
-                        tvMaghribIqama.setText(timings.getString("Maghrib"));
-                        tvIshaIqama.setText(timings.getString("Isha"));
+                        // Update UI
+                        tvFajrIqama.setText(fajrIqama);
+                        tvDhuhrIqama.setText(dhuhrIqama);
+                        tvAsrIqama.setText(asrIqama);
+                        tvMaghribIqama.setText(maghribIqama);
+                        tvIshaIqama.setText(ishaIqama);
+
+                        // Save to database
+                        if (dbHelper != null) {
+                            String updatedAt = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", java.util.Locale.getDefault()).format(new java.util.Date());
+                            dbHelper.updatePrayerTimes(
+                                tvFajrTime.getText().toString(),
+                                tvDhuhrTime.getText().toString(),
+                                tvAsrTime.getText().toString(),
+                                tvMaghribTime.getText().toString(),
+                                tvIshaTime.getText().toString(),
+                                fajrIqama,
+                                dhuhrIqama,
+                                asrIqama,
+                                maghribIqama,
+                                ishaIqama,
+                                updatedAt
+                            );
+                        }
 
                         // Show a success message
                         Toast.makeText(getContext(), "Prayer times updated successfully", Toast.LENGTH_SHORT).show();
