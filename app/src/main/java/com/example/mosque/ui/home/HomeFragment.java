@@ -326,11 +326,96 @@ public class HomeFragment extends Fragment {
             tvAsrIqama.setText(times.getAsrIqama());
             tvMaghribIqama.setText(times.getMagribIqama());
             tvIshaIqama.setText(times.getIshaIqama());
+
+            // Highlight the current prayer time
+            highlightCurrentPrayerTime();
         } else {
             // If no data exists, show error message
             Toast.makeText(getActivity(), "No prayer times available in local database", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void highlightCurrentPrayerTime() {
+        try {
+            // Reset all card views and text views to default state
+            resetAllPrayerViews();
+
+            // Parse Iqama times
+            Date fajrIqamaTime = sdf.parse(tvFajrIqama.getText().toString());
+            Date dhuhrIqamaTime = sdf.parse(tvDhuhrIqama.getText().toString());
+            Date asrIqamaTime = sdf.parse(tvAsrIqama.getText().toString());
+            Date maghribIqamaTime = sdf.parse(tvMaghribIqama.getText().toString());
+            Date ishaIqamaTime = sdf.parse(tvIshaIqama.getText().toString());
+            String currentTimeStr = sdf.format(now);
+            Date currentTime = sdf.parse(currentTimeStr);
+
+            // Highlight Fajr only if current time is before sunrise
+            Date sunriseTime = null;
+            if (sunriseTimeStr != null) {
+                sunriseTime = sdf.parse(sunriseTimeStr);
+            }
+            if (sunriseTime != null && currentTime.before(sunriseTime)) {
+                highlightPrayerView(fajr_Cardview, tvFajr, tvFajrTime, tvFajrIqama);
+            }
+            else if (currentTime.after(dhuhrIqamaTime) && currentTime.before(asrIqamaTime)) {
+                highlightPrayerView(dhuhr_Cardview, tvDhuhr, tvDhuhrTime, tvDhuhrIqama);
+            } else if (currentTime.after(asrIqamaTime) && currentTime.before(maghribIqamaTime)) {
+                highlightPrayerView(asr_Cardview, tvAsr, tvAsrTime, tvAsrIqama);
+            } else if (currentTime.after(maghribIqamaTime) && currentTime.before(ishaIqamaTime)) {
+                highlightPrayerView(maghrib_Cardview, tvMaghrib, tvMaghribTime, tvMaghribIqama);
+            } else {
+                // Highlight Isha only if current time is before midnight
+                SimpleDateFormat midnightFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+                Date midnight = midnightFormat.parse("00:00");
+                // If current time is before midnight (i.e., still today)
+                if (currentTime.before(midnight)) {
+                    highlightPrayerView(isha_Cardview, tvIsha, tvIshaTime, tvIshaIqama);
+                }
+            }
+        } catch (Exception e) {
+            Log.e("HomeFragment", "Error highlighting prayer time: " + e.getMessage());
+        }
+    }
+
+    private void resetAllPrayerViews() {
+        // Reset all card views
+        fajr_Cardview.setStrokeWidth(0);
+        dhuhr_Cardview.setStrokeWidth(0);
+        asr_Cardview.setStrokeWidth(0);
+        maghrib_Cardview.setStrokeWidth(0);
+        isha_Cardview.setStrokeWidth(0);
+
+        // Reset all text views
+        int defaultColor = ContextCompat.getColor(getContext(), R.color.black);
+        Typeface defaultTypeface = Typeface.DEFAULT;
+
+        resetTextView(tvFajr, tvFajrTime, tvFajrIqama);
+        resetTextView(tvDhuhr, tvDhuhrTime, tvDhuhrIqama);
+        resetTextView(tvAsr, tvAsrTime, tvAsrIqama);
+        resetTextView(tvMaghrib, tvMaghribTime, tvMaghribIqama);
+        resetTextView(tvIsha, tvIshaTime, tvIshaIqama);
+    }
+
+    private void resetTextView(TextView... textViews) {
+        int defaultColor = ContextCompat.getColor(getContext(), R.color.black);
+        Typeface defaultTypeface = Typeface.DEFAULT;
+        for (TextView tv : textViews) {
+            tv.setTextColor(defaultColor);
+            tv.setTypeface(defaultTypeface);
+        }
+    }
+
+    private void highlightPrayerView(MaterialCardView cardView, TextView... textViews) {
+        int highlightColor = ContextCompat.getColor(getContext(), R.color.purple_700);
+        cardView.setStrokeColor(highlightColor);
+        cardView.setStrokeWidth(10);
+
+        for (TextView tv : textViews) {
+            tv.setTextColor(highlightColor);
+            tv.setTypeface(null, Typeface.BOLD);
+        }
+    }
+
     private void getPrayerTimes_and_upadet_bolf() {
         // Initialize dbHelper if it's null
         if (dbHelper == null) {
@@ -384,73 +469,8 @@ public class HomeFragment extends Fragment {
                                 Toast.makeText(getActivity(), "Error updating local database", Toast.LENGTH_SHORT).show();
                             }
 
-                            // Parse Iqama times instead of prayer times
-                            Date fajrIqamaTime = sdf.parse(tvFajrIqama.getText().toString());
-                            Date dhuhrIqamaTime = sdf.parse(tvDhuhrIqama.getText().toString());
-                            Date asrIqamaTime = sdf.parse(tvAsrIqama.getText().toString());
-                            Date maghribIqamaTime = sdf.parse(tvMaghribIqama.getText().toString());
-                            Date ishaIqamaTime = sdf.parse(tvIshaIqama.getText().toString());
-                            String currentTimeStr = sdf.format(now);
-                            Date currentTime = sdf.parse(currentTimeStr);
-
-                            // Highlight Fajr only if current time is before sunrise
-                            Date sunriseTime = null;
-                            if (sunriseTimeStr != null) {
-                                sunriseTime = sdf.parse(sunriseTimeStr);
-                            }
-                            if (sunriseTime != null && currentTime.before(sunriseTime)) {
-                                tvFajr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvFajrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvFajrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvFajr.setTypeface(null, Typeface.BOLD);
-                                tvFajrTime.setTypeface(null, Typeface.BOLD);
-                                tvFajrIqama.setTypeface(null, Typeface.BOLD);
-                                fajr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                fajr_Cardview.setStrokeWidth(10);
-                            }
-                            else if (currentTime.after(dhuhrIqamaTime) && currentTime.before(asrIqamaTime)) {
-                                tvDhuhr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvDhuhrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvDhuhrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvDhuhr.setTypeface(null, Typeface.BOLD);
-                                tvDhuhrTime.setTypeface(null, Typeface.BOLD);
-                                tvDhuhrIqama.setTypeface(null, Typeface.BOLD);
-                                dhuhr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                dhuhr_Cardview.setStrokeWidth(10);
-                            } else if (currentTime.after(asrIqamaTime) && currentTime.before(maghribIqamaTime)) {
-                                tvAsr.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvAsrTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvAsrIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvAsr.setTypeface(null, Typeface.BOLD);
-                                tvAsrTime.setTypeface(null, Typeface.BOLD);
-                                tvAsrIqama.setTypeface(null, Typeface.BOLD);
-                                asr_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                asr_Cardview.setStrokeWidth(10);
-                            } else if (currentTime.after(maghribIqamaTime) && currentTime.before(ishaIqamaTime)) {
-                                tvMaghrib.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvMaghribTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvMaghribIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                tvMaghrib.setTypeface(null, Typeface.BOLD);
-                                tvMaghribTime.setTypeface(null, Typeface.BOLD);
-                                tvMaghribIqama.setTypeface(null, Typeface.BOLD);
-                                maghrib_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                maghrib_Cardview.setStrokeWidth(10);
-                            } else {
-                                // Highlight Isha only if current time is before midnight
-                                SimpleDateFormat midnightFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                                Date midnight = midnightFormat.parse("00:00");
-                                // If current time is before midnight (i.e., still today)
-                                if (currentTime.before(midnight)) {
-                                    tvIsha.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                    tvIshaTime.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                    tvIshaIqama.setTextColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                    tvIsha.setTypeface(null, Typeface.BOLD);
-                                    tvIshaTime.setTypeface(null, Typeface.BOLD);
-                                    tvIshaIqama.setTypeface(null, Typeface.BOLD);
-                                    isha_Cardview.setStrokeColor(ContextCompat.getColor(getContext(), R.color.purple_700));
-                                    isha_Cardview.setStrokeWidth(10);
-                                }
-                            }
+                            // Highlight the current prayer time
+                            highlightCurrentPrayerTime();
 
                         } catch (Exception e) {
                             Log.e("MainActivity", "JSON parse / view‑binding failed", e);
@@ -473,7 +493,6 @@ public class HomeFragment extends Fragment {
                 }
         );
         queue.add(jsonArrayRequest);
-
     }
 
     private void showTimePicker1(String prayer) {
