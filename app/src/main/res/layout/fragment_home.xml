@@ -506,4 +506,13 @@
 
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tvSunriseTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@color/black"
+        android:layout_marginTop="8dp"
+        android:text="--:--" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
